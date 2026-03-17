@@ -13,8 +13,7 @@ export async function fetchStoreData(path: string, params: Record<string, string
     
     const res = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${masterKey}`,
-        'x-public-api-key': masterKey
+        Authorization: `Bearer ${masterKey}`
       },
       next: { revalidate: 60 }
     });

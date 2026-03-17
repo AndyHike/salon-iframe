@@ -24,7 +24,6 @@ export async function sendMessage(domain: string, formData: FormData) {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${masterKey}`,
-        'x-public-api-key': masterKey,
       },
       body: JSON.stringify({ name, email, phone, subject, message }),
     });
