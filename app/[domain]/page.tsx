@@ -33,7 +33,12 @@ export default async function DomainPage({ params }: { params: Promise<{ domain:
 
   let layoutConfig: string[] = [];
   try {
-    layoutConfig = JSON.parse(siteData.layoutConfig);
+    const parsed = typeof siteData.layoutConfig === 'string'
+      ? JSON.parse(siteData.layoutConfig)
+      : siteData.layoutConfig;
+    if (Array.isArray(parsed)) {
+      layoutConfig = parsed;
+    }
   } catch (e) {
     console.error('Failed to parse layoutConfig', e);
   }

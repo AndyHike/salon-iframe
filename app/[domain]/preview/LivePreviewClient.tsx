@@ -53,7 +53,12 @@ export function LivePreviewClient({
 
   let layoutConfigArray: string[] = [];
   try {
-    layoutConfigArray = JSON.parse(siteData.layoutConfig);
+    const parsed = typeof siteData.layoutConfig === 'string'
+      ? JSON.parse(siteData.layoutConfig)
+      : siteData.layoutConfig;
+    if (Array.isArray(parsed)) {
+      layoutConfigArray = parsed;
+    }
   } catch (e) {
     console.error('Failed to parse layoutConfig', e);
   }
