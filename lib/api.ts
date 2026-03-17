@@ -2,6 +2,9 @@ const adminApiUrl = process.env.ADMIN_API_URL;
 const masterKey = process.env.SYSTEM_MASTER_KEY;
 
 export async function fetchStoreData(path: string, params: Record<string, string>, domain: string) {
+  if (!domain || domain === 'favicon.ico' || domain === 'robots.txt' || domain === 'sitemap.xml' || domain.includes('.png') || domain.includes('.jpg')) {
+    return null;
+  }
   if (!adminApiUrl || !masterKey) return null;
   
   try {

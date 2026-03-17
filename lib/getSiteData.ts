@@ -14,6 +14,11 @@ export interface SiteData {
 }
 
 export async function getSiteData(domain: string): Promise<SiteData | null> {
+  // Ignore static files that might bypass middleware
+  if (!domain || domain === 'favicon.ico' || domain === 'robots.txt' || domain === 'sitemap.xml' || domain.includes('.png') || domain.includes('.jpg')) {
+    return null;
+  }
+
   const adminApiUrl = process.env.ADMIN_API_URL;
   const masterKey = process.env.SYSTEM_MASTER_KEY;
 
