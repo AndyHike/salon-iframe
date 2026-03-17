@@ -1,6 +1,7 @@
 import { getSiteData } from '@/lib/getSiteData';
 import { notFound } from 'next/navigation';
 import { ComponentMapper } from '@/components/ComponentMapper';
+import { FontLoader } from '@/components/FontLoader';
 import { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
@@ -44,7 +45,15 @@ export default async function DomainPage({ params }: { params: Promise<{ domain:
   }
 
   return (
-    <main className="flex-grow">
+    <main
+      data-button-style={siteData.buttonStyle || 'pill'}
+      style={{
+        '--primary-color': siteData.primaryColor,
+        fontFamily: siteData.fontFamily,
+      } as any}
+      className="flex-grow flex flex-col w-full transition-colors duration-300"
+    >
+      <FontLoader fontFamily={siteData.fontFamily} />
       {layoutConfig.map((componentName, index) => (
         <ComponentMapper key={`${componentName}-${index}`} name={componentName} siteData={siteData} />
       ))}

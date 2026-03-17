@@ -57,7 +57,11 @@ export function Contacts({ siteData }: { siteData: SiteData }) {
                 <label className="block text-sm font-medium text-stone-700 mb-1">Message</label>
                 <textarea rows={4} className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]" placeholder="How can we help you?"></textarea>
               </div>
-              <button type="button" className="w-full py-3 rounded-lg text-white font-medium transition-opacity hover:opacity-90 shadow-md bg-[var(--primary-color)]">
+              <button 
+                type="button" 
+                className="w-full py-3 text-white font-medium transition-opacity hover:opacity-90 shadow-md bg-[var(--primary-color)]"
+                style={{ borderRadius: 'var(--btn-radius)' }}
+              >
                 Send Message
               </button>
             </form>

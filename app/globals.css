@@ -1,1 +1,20 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@layer base {
+  :root {
+    --btn-radius: 9999px; /* default pill */
+  }
+
+  [data-button-style="pill"] {
+    --btn-radius: 9999px;
+  }
+
+  [data-button-style="square"] {
+    --btn-radius: 0px;
+  }
+
+  [data-button-style="soft"] {
+    --btn-radius: 12px;
+  }
+}

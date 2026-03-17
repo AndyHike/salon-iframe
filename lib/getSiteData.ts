@@ -3,7 +3,10 @@ export interface SiteData {
   storeId: string;
   primaryColor: string;
   fontFamily: string;
-  layoutConfig: string; // JSON string array
+  layoutConfig: string | string[]; // Can be JSON string or array
+  buttonStyle?: 'pill' | 'square' | 'soft';
+  heroBackgroundImage?: string;
+  heroOverlay?: number;
   logoUrl: string | null;
   name?: string;
   description?: string;
@@ -52,7 +55,10 @@ function getMockData(domain: string): SiteData {
     storeId: `mock-store-id-${domain}`,
     primaryColor: colors[colorIndex],
     fontFamily: "'Inter', sans-serif",
-    layoutConfig: '["hero", "services", "gallery", "contacts"]',
+    layoutConfig: ['hero', 'services', 'gallery', 'contacts'],
+    buttonStyle: 'pill',
+    heroBackgroundImage: 'https://picsum.photos/seed/salon/1920/1080',
+    heroOverlay: 0.4,
     logoUrl: null,
     name: `${domain.split('.')[0].toUpperCase()} Salon`,
     description: `Welcome to ${domain}, your premium beauty and grooming destination.`,

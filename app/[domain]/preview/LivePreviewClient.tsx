@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { SiteData } from '@/lib/getSiteData';
 import { ComponentMapper } from '@/components/ComponentMapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { FontLoader } from '@/components/FontLoader';
 
 export function LivePreviewClient({
   initialApiData,
@@ -25,6 +26,9 @@ export function LivePreviewClient({
     primaryColor: getParam('primaryColor') || initialApiData?.primaryColor || '#0f172a',
     fontFamily: getParam('fontFamily') || initialApiData?.fontFamily || "'Inter', sans-serif",
     layoutConfig: getParam('layoutConfig') || initialApiData?.layoutConfig || '["hero", "services", "gallery", "contacts"]',
+    buttonStyle: (getParam('buttonStyle') as any) || initialApiData?.buttonStyle || 'pill',
+    heroBackgroundImage: getParam('heroBackgroundImage') || initialApiData?.heroBackgroundImage || '',
+    heroOverlay: getParam('heroOverlay') ? parseFloat(getParam('heroOverlay') as string) : initialApiData?.heroOverlay || 0.4,
     logoUrl: getParam('logoUrl') || initialApiData?.logoUrl || null,
     name: getParam('name') || initialApiData?.name || 'Preview Salon',
     description: getParam('description') || initialApiData?.description || 'Preview Description',
@@ -70,12 +74,14 @@ export function LivePreviewClient({
 
   return (
     <div
+      data-button-style={siteData.buttonStyle || 'pill'}
       style={{
         '--primary-color': siteData.primaryColor,
         fontFamily: siteData.fontFamily,
       } as any}
       className="flex-grow flex flex-col w-full transition-colors duration-300"
     >
+      <FontLoader fontFamily={siteData.fontFamily} />
       {layoutConfigArray.map((componentName, index) => (
         <ErrorBoundary key={`${componentName}-${index}`}>
           <ComponentMapper name={componentName} siteData={siteData} />
