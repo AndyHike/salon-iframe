@@ -23,11 +23,13 @@ export async function getSiteData(domain: string): Promise<SiteData | null> {
   }
 
   try {
-    const res = await fetch(`${adminApiUrl}/api/v1/internal/appearance?domain=${domain}`, {
+    const cleanApiUrl = adminApiUrl.endsWith('/') ? adminApiUrl.slice(0, -1) : adminApiUrl;
+    const res = await fetch(`${cleanApiUrl}/api/v1/internal/appearance?domain=${domain}`, {
       headers: {
-        Authorization: `Bearer ${masterKey}`,
+        Authorization: `Bearer ${masterKey.trim()}`,
+        'Content-Type': 'application/json'
       },
-      next: { revalidate: 60 }, // Cache for 60 seconds
+      next: { revalidate: 10 }, // Cache for 10 seconds
     });
 
     if (!res.ok) {

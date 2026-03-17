@@ -5,7 +5,9 @@ export async function fetchStoreData(path: string, params: Record<string, string
   if (!adminApiUrl || !masterKey) return null;
   
   try {
-    const url = new URL(`${adminApiUrl}${path}`);
+    const cleanApiUrl = adminApiUrl.endsWith('/') ? adminApiUrl.slice(0, -1) : adminApiUrl;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    const url = new URL(`${cleanApiUrl}${cleanPath}`);
     url.searchParams.append('domain', domain);
     for (const [key, value] of Object.entries(params)) {
       url.searchParams.append(key, value);
@@ -13,9 +15,10 @@ export async function fetchStoreData(path: string, params: Record<string, string
     
     const res = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${masterKey}`
+        Authorization: `Bearer ${masterKey.trim()}`,
+        'Content-Type': 'application/json'
       },
-      next: { revalidate: 60 }
+      next: { revalidate: 10 }
     });
     
     if (!res.ok) {

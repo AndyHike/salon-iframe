@@ -16,14 +16,15 @@ export async function sendMessage(domain: string, formData: FormData) {
   const message = formData.get('message') as string;
 
   try {
-    const url = new URL(`${adminApiUrl}/api/public/v1/messages`);
+    const cleanApiUrl = adminApiUrl.endsWith('/') ? adminApiUrl.slice(0, -1) : adminApiUrl;
+    const url = new URL(`${cleanApiUrl}/api/public/v1/messages`);
     url.searchParams.append('domain', domain);
 
     const res = await fetch(url.toString(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${masterKey}`,
+        Authorization: `Bearer ${masterKey.trim()}`,
       },
       body: JSON.stringify({ name, email, phone, subject, message }),
     });
