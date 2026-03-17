@@ -1,32 +1,53 @@
 import { SiteData } from '@/lib/getSiteData';
-import { Scissors, Sparkles, Droplets } from 'lucide-react';
+import { StoreData } from '@/lib/api';
 
-const mockServices = [
-  { id: 1, name: 'Classic Haircut', price: '$40', icon: Scissors, description: 'Precision cut with hot towel finish.' },
-  { id: 2, name: 'Beard Trim', price: '$25', icon: Droplets, description: 'Detailed shaping and conditioning.' },
-  { id: 3, name: 'Premium Facial', price: '$60', icon: Sparkles, description: 'Rejuvenating skin treatment.' },
-];
+export function ServicesList({ siteData, storeData }: { siteData: SiteData; storeData: StoreData }) {
+  const servicesData = storeData.servicesData || [];
 
-export function ServicesList({ siteData }: { siteData: SiteData }) {
   return (
-    <section className="py-24 bg-white">
+    <section id="services" className="py-24 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-stone-900 mb-4">Our Services</h2>
+          <h2 className="text-3xl md:text-4xl font-serif text-stone-900 mb-4">Our Services</h2>
           <div className="w-24 h-1 mx-auto rounded bg-[var(--primary-color)]"></div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {mockServices.map((service) => (
-            <div key={service.id} className="p-8 rounded-2xl border border-stone-100 shadow-sm hover:shadow-md transition-shadow bg-stone-50 group">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center mb-6 transition-transform group-hover:scale-110 bg-[var(--primary-color)] text-white">
-                <service.icon size={24} />
+        
+        {servicesData.length === 0 ? (
+          <p className="text-center text-stone-500">No services available at the moment.</p>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            {servicesData.map((group: any, index: number) => (
+              <div key={group.category?.id || index} className="bg-stone-50/50 p-8 rounded-3xl border border-stone-100">
+                {group.category?.title && (
+                  <h3 className="text-2xl font-serif text-stone-800 mb-8 border-b border-stone-200 pb-4 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-full bg-[var(--primary-color)]/10 flex items-center justify-center text-[var(--primary-color)] text-sm font-bold">
+                      {index + 1}
+                    </span>
+                    {group.category.title.uk || group.category.title.en}
+                  </h3>
+                )}
+                <div className="space-y-6">
+                  {group.items.map((service: any) => (
+                    <div key={service.id} className="flex flex-col group/item">
+                      <div className="flex justify-between items-baseline mb-2">
+                        <h4 className="text-lg font-medium text-stone-900 group-hover/item:text-[var(--primary-color)] transition-colors">
+                          {service.title?.uk || service.title?.en}
+                        </h4>
+                        <div className="flex-grow border-b-2 border-dotted border-stone-200 mx-4 opacity-50"></div>
+                        <span className="text-lg font-semibold text-stone-900">
+                          {service.price ? `${service.price} ₴` : 'Price on request'}
+                        </span>
+                      </div>
+                      <p className="text-stone-500 text-sm pr-16 leading-relaxed">
+                        {service.description?.uk || service.description?.en}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-stone-900 mb-2">{service.name}</h3>
-              <p className="text-stone-500 mb-4">{service.description}</p>
-              <p className="text-2xl font-bold text-[var(--primary-color)]">{service.price}</p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

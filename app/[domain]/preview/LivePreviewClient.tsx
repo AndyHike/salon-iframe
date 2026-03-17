@@ -2,15 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { SiteData } from '@/lib/getSiteData';
+import { StoreData } from '@/lib/api';
 import { ComponentMapper } from '@/components/ComponentMapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FontLoader } from '@/components/FontLoader';
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
 
 export function LivePreviewClient({
   initialApiData,
+  storeData,
   searchParams,
 }: {
   initialApiData: SiteData | null;
+  storeData: StoreData;
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   // Helper to safely get string from searchParams
@@ -29,6 +34,7 @@ export function LivePreviewClient({
     buttonStyle: (getParam('buttonStyle') as any) || initialApiData?.buttonStyle || 'pill',
     heroBackgroundImage: getParam('heroBackgroundImage') || initialApiData?.heroBackgroundImage || '',
     heroOverlay: getParam('heroOverlay') ? parseFloat(getParam('heroOverlay') as string) : initialApiData?.heroOverlay || 0.4,
+    galleryLayout: (getParam('galleryLayout') as any) || initialApiData?.galleryLayout || 'grid',
     logoUrl: getParam('logoUrl') || initialApiData?.logoUrl || null,
     name: getParam('name') || initialApiData?.name || 'Preview Salon',
     description: getParam('description') || initialApiData?.description || 'Preview Description',
@@ -82,11 +88,15 @@ export function LivePreviewClient({
       className="flex-grow flex flex-col w-full transition-colors duration-300"
     >
       <FontLoader fontFamily={siteData.fontFamily} />
-      {layoutConfigArray.map((componentName, index) => (
-        <ErrorBoundary key={`${componentName}-${index}`}>
-          <ComponentMapper name={componentName} siteData={siteData} />
-        </ErrorBoundary>
-      ))}
+      <Navbar siteData={siteData} storeData={storeData} layoutConfig={layoutConfigArray} />
+      <main className="flex-grow">
+        {layoutConfigArray.map((componentName, index) => (
+          <ErrorBoundary key={`${componentName}-${index}`}>
+            <ComponentMapper name={componentName} siteData={siteData} storeData={storeData} />
+          </ErrorBoundary>
+        ))}
+      </main>
+      <Footer siteData={siteData} storeData={storeData} />
     </div>
   );
 }

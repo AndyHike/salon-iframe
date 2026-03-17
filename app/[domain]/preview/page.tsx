@@ -1,4 +1,5 @@
 import { getSiteData } from '@/lib/getSiteData';
+import { getStoreData } from '@/lib/api';
 import { LivePreviewClient } from './LivePreviewClient';
 
 export default async function PreviewPage({
@@ -12,14 +13,18 @@ export default async function PreviewPage({
   const resolvedSearchParams = await searchParams;
   
   // Fetch the saved API data
-  const siteData = await getSiteData(domain);
+  const [siteData, storeData] = await Promise.all([
+    getSiteData(domain),
+    getStoreData(domain)
+  ]);
 
   return (
-    <main className="flex-grow flex flex-col">
+    <div className="flex-grow flex flex-col min-h-screen">
       <LivePreviewClient
         initialApiData={siteData}
+        storeData={storeData}
         searchParams={resolvedSearchParams}
       />
-    </main>
+    </div>
   );
 }

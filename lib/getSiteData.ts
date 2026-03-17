@@ -7,6 +7,7 @@ export interface SiteData {
   buttonStyle?: 'pill' | 'square' | 'soft';
   heroBackgroundImage?: string;
   heroOverlay?: number;
+  galleryLayout?: 'grid' | 'masonry' | 'carousel';
   logoUrl: string | null;
   name?: string;
   description?: string;
