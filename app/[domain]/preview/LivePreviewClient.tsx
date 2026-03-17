@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { SiteData } from '@/lib/getSiteData';
 import { ComponentMapper } from '@/components/ComponentMapper';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export function LivePreviewClient({
   initialApiData,
@@ -29,7 +30,12 @@ export function LivePreviewClient({
     description: getParam('description') || initialApiData?.description || 'Preview Description',
   });
 
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
+    // Mark as mounted to avoid hydration mismatch errors
+    setIsMounted(true);
+
     const handleMessage = (event: MessageEvent) => {
       // Listen for the specific update event from the parent window (admin dashboard)
       if (event.data?.type === 'UPDATE_APPEARANCE') {
@@ -40,6 +46,7 @@ export function LivePreviewClient({
       }
     };
 
+    // Add event listener safely only on the client side
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, []);
@@ -51,16 +58,23 @@ export function LivePreviewClient({
     console.error('Failed to parse layoutConfig', e);
   }
 
+  // Prevent hydration errors by rendering a safe fallback until the client has mounted
+  if (!isMounted) {
+    return <div className="flex-grow flex flex-col w-full min-h-screen bg-stone-50 animate-pulse" />;
+  }
+
   return (
     <div
       style={{
         '--primary-color': siteData.primaryColor,
         fontFamily: siteData.fontFamily,
-      } as React.CSSProperties}
+      } as any}
       className="flex-grow flex flex-col w-full transition-colors duration-300"
     >
       {layoutConfigArray.map((componentName, index) => (
-        <ComponentMapper key={`${componentName}-${index}`} name={componentName} siteData={siteData} />
+        <ErrorBoundary key={`${componentName}-${index}`}>
+          <ComponentMapper name={componentName} siteData={siteData} />
+        </ErrorBoundary>
       ))}
     </div>
   );
