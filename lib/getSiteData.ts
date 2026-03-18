@@ -8,6 +8,7 @@ export interface SiteData {
   heroBackgroundImage?: string;
   heroOverlay?: number;
   galleryLayout?: 'grid' | 'masonry' | 'carousel';
+  servicesLayout?: 'list' | 'grid' | 'cards' | 'compact';
   logoUrl: string | null;
   name?: string;
   description?: string;

@@ -1,11 +1,9 @@
 import { getSiteData } from '@/lib/getSiteData';
 import { getStoreData } from '@/lib/api';
 import { notFound } from 'next/navigation';
-import { ComponentMapper } from '@/components/ComponentMapper';
-import { FontLoader } from '@/components/FontLoader';
 import { Metadata } from 'next';
-import { Footer } from '@/components/Footer';
-import { Navbar } from '@/components/Navbar';
+import { ClientProviders } from '@/components/ClientProviders';
+import { PreviewWrapper } from '@/components/PreviewWrapper';
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
   const { domain } = await params;
@@ -50,23 +48,16 @@ export default async function DomainPage({ params }: { params: Promise<{ domain:
     console.error('Failed to parse layoutConfig', e);
   }
 
+  const availableLocales = storeData.settings?.locales || ['uk', 'en', 'cs'];
+  const defaultLocale = storeData.settings?.defaultLocale || 'uk';
+
   return (
-    <div
-      data-button-style={siteData.buttonStyle || 'pill'}
-      style={{
-        '--primary-color': siteData.primaryColor,
-        fontFamily: siteData.fontFamily,
-      } as any}
-      className="flex flex-col min-h-screen w-full transition-colors duration-300"
-    >
-      <FontLoader fontFamily={siteData.fontFamily} />
-      <Navbar siteData={siteData} storeData={storeData} layoutConfig={layoutConfig} />
-      <main className="flex-grow">
-        {layoutConfig.map((componentName, index) => (
-          <ComponentMapper key={`${componentName}-${index}`} name={componentName} siteData={siteData} storeData={storeData} />
-        ))}
-      </main>
-      <Footer siteData={siteData} storeData={storeData} />
-    </div>
+    <ClientProviders defaultLocale={defaultLocale} availableLocales={availableLocales}>
+      <PreviewWrapper 
+        initialSiteData={siteData} 
+        storeData={storeData} 
+        initialLayoutConfig={layoutConfig} 
+      />
+    </ClientProviders>
   );
 }

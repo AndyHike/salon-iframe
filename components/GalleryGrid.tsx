@@ -1,26 +1,42 @@
+'use client';
+
 import { SiteData } from '@/lib/getSiteData';
 import { StoreData } from '@/lib/api';
 import Image from 'next/image';
+import { useLocale } from './LocaleContext';
+import { motion } from 'motion/react';
 
 export function GalleryGrid({ siteData, storeData }: { siteData: SiteData; storeData: StoreData }) {
   const galleryItems = storeData.galleryItems || [];
+  const { t } = useLocale();
   
   // Extract all images from gallery items
   const images = galleryItems.flatMap(item => item.images || []);
   const layout = siteData.galleryLayout || 'grid';
 
   return (
-    <section id="gallery" className="py-24 bg-stone-50">
+    <section id="gallery" className="py-24 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-serif text-stone-900 mb-4">Gallery</h2>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-serif text-stone-900 mb-6">{t('gallery.title')}</h2>
           <div className="w-24 h-1 mx-auto rounded bg-[var(--primary-color)]"></div>
-        </div>
+        </motion.div>
         
         {images.length === 0 ? (
-          <p className="text-center text-stone-500">No images available in the gallery.</p>
+          <p className="text-center text-stone-500">{t('gallery.empty')}</p>
         ) : (
-          <>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
             {layout === 'grid' && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
                 {images.map((image: any, i: number) => (
@@ -69,7 +85,7 @@ export function GalleryGrid({ siteData, storeData }: { siteData: SiteData; store
                 ))}
               </div>
             )}
-          </>
+          </motion.div>
         )}
       </div>
     </section>

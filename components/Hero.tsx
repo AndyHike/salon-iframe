@@ -1,9 +1,14 @@
+'use client';
+
 import { SiteData } from '@/lib/getSiteData';
 import { StoreData } from '@/lib/api';
+import { useLocale } from './LocaleContext';
+import { motion } from 'motion/react';
 
 export function Hero({ siteData, storeData }: { siteData: SiteData; storeData: StoreData }) {
   const hasBgImage = !!siteData.heroBackgroundImage;
   const overlayOpacity = siteData.heroOverlay !== undefined ? siteData.heroOverlay : 0.4;
+  const { t } = useLocale();
 
   return (
     <section 
@@ -17,7 +22,12 @@ export function Hero({ siteData, storeData }: { siteData: SiteData; storeData: S
         <div className="absolute inset-0 z-0 opacity-5 bg-[var(--primary-color)]"></div>
       )}
       
-      <div className={`container mx-auto px-4 relative z-10 text-center ${hasBgImage ? 'text-white' : 'text-stone-900'}`}>
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className={`container mx-auto px-4 relative z-10 text-center ${hasBgImage ? 'text-white' : 'text-stone-900'}`}
+      >
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif tracking-tight mb-6 drop-shadow-sm">
           {siteData.name || 'Premium Salon & Barbershop'}
         </h1>
@@ -30,17 +40,17 @@ export function Hero({ siteData, storeData }: { siteData: SiteData; storeData: S
             className="px-8 py-4 text-white font-medium text-lg transition-transform hover:scale-105 shadow-lg bg-[var(--primary-color)] inline-block"
             style={{ borderRadius: 'var(--btn-radius)' }}
           >
-            Explore Services
+            {t('nav.services')}
           </a>
           <a 
             href="#contacts"
             className={`px-8 py-4 font-medium text-lg transition-transform hover:scale-105 inline-block border-2 ${hasBgImage ? 'border-white text-white hover:bg-white/10' : 'border-[var(--primary-color)] text-[var(--primary-color)] hover:bg-[var(--primary-color)]/5'}`}
             style={{ borderRadius: 'var(--btn-radius)' }}
           >
-            Book an Appointment
+            {t('btn.book')}
           </a>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

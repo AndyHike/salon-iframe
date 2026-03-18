@@ -127,6 +127,8 @@ function getMockItems(categorySlug?: string) {
 
 function getMockSettings() {
   return {
+    locales: ['uk', 'en', 'cs'],
+    defaultLocale: 'uk',
     workingHours: {
       byAppointment: false,
       days: [
