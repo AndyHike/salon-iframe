@@ -47,7 +47,8 @@ export async function getSiteData(domain: string): Promise<SiteData | null> {
     if (json.success && json.data) {
       return json.data;
     }
-    return null;
+    console.warn(`API returned success: false for ${domain}. Falling back to mock data.`);
+    return getMockData(domain);
   } catch (error) {
     console.error(`Error fetching site data for ${domain}:`, error);
     return getMockData(domain);

@@ -1,6 +1,7 @@
 import { getSiteData } from '@/lib/getSiteData';
 import { getStoreData } from '@/lib/api';
 import { LivePreviewClient } from './LivePreviewClient';
+import { ClientProviders } from '@/components/ClientProviders';
 
 export default async function PreviewPage({
   params,
@@ -18,13 +19,18 @@ export default async function PreviewPage({
     getStoreData(domain)
   ]);
 
+  const availableLocales = storeData.settings?.locales || ['uk', 'en', 'cs'];
+  const defaultLocale = storeData.settings?.defaultLocale || 'uk';
+
   return (
-    <div className="flex-grow flex flex-col min-h-screen">
-      <LivePreviewClient
-        initialApiData={siteData}
-        storeData={storeData}
-        searchParams={resolvedSearchParams}
-      />
-    </div>
+    <ClientProviders defaultLocale={defaultLocale} availableLocales={availableLocales}>
+      <div className="flex-grow flex flex-col min-h-screen">
+        <LivePreviewClient
+          initialApiData={siteData}
+          storeData={storeData}
+          searchParams={resolvedSearchParams}
+        />
+      </div>
+    </ClientProviders>
   );
 }

@@ -167,15 +167,23 @@ export function LocaleProvider({
   const [locale, setLocaleState] = useState(defaultLocale);
 
   useEffect(() => {
-    const savedLocale = localStorage.getItem('locale');
-    if (savedLocale && availableLocales.includes(savedLocale)) {
-      setLocaleState(savedLocale);
+    try {
+      const savedLocale = localStorage.getItem('locale');
+      if (savedLocale && availableLocales.includes(savedLocale)) {
+        setLocaleState(savedLocale);
+      }
+    } catch (e) {
+      console.warn('localStorage is not available:', e);
     }
   }, [availableLocales]);
 
   const setLocale = (newLocale: string) => {
     setLocaleState(newLocale);
-    localStorage.setItem('locale', newLocale);
+    try {
+      localStorage.setItem('locale', newLocale);
+    } catch (e) {
+      console.warn('localStorage is not available:', e);
+    }
   };
 
   const t = (key: string) => {
