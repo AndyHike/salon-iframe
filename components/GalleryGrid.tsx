@@ -3,15 +3,19 @@
 import { SiteData } from '@/lib/getSiteData';
 import { StoreData } from '@/lib/api';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useLocale } from './LocaleContext';
 import { motion } from 'motion/react';
 
-export function GalleryGrid({ siteData, storeData }: { siteData: SiteData; storeData: StoreData }) {
+export function GalleryGrid({ siteData, storeData, limit }: { siteData: SiteData; storeData: StoreData; limit?: number }) {
   const galleryItems = storeData.galleryItems || [];
   const { t } = useLocale();
   
   // Extract all images from gallery items
-  const images = galleryItems.flatMap(item => item.images || []);
+  let images = galleryItems.flatMap(item => item.images || []);
+  if (limit) {
+    images = images.slice(0, limit);
+  }
   const layout = siteData.galleryLayout || 'grid';
 
   return (
@@ -86,6 +90,17 @@ export function GalleryGrid({ siteData, storeData }: { siteData: SiteData; store
               </div>
             )}
           </motion.div>
+        )}
+        
+        {limit && storeData.galleryItems && storeData.galleryItems.flatMap(item => item.images || []).length > limit && (
+          <div className="mt-16 text-center">
+            <Link 
+              href="/gallery" 
+              className="inline-block px-8 py-4 rounded-full font-medium transition-colors bg-stone-900 text-white hover:bg-stone-800"
+            >
+              {t('gallery.viewAll')}
+            </Link>
+          </div>
         )}
       </div>
     </section>

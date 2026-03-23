@@ -45,6 +45,8 @@ const translations: Record<string, Record<string, string>> = {
     'contacts.formSend': 'Надіслати повідомлення',
     'contacts.formSuccess': 'Повідомлення успішно надіслано!',
     'contacts.formError': 'Не вдалося надіслати повідомлення.',
+    'services.viewAll': 'Переглянути всі послуги',
+    'gallery.viewAll': 'Переглянути всю галерею',
     'footer.contact': 'Контакти',
     'footer.social': 'Соціальні мережі',
     'footer.allRightsReserved': 'Всі права захищено.',
@@ -92,6 +94,8 @@ const translations: Record<string, Record<string, string>> = {
     'contacts.formSend': 'Send Message',
     'contacts.formSuccess': 'Message sent successfully!',
     'contacts.formError': 'Failed to send message.',
+    'services.viewAll': 'View All Services',
+    'gallery.viewAll': 'View Full Gallery',
     'footer.contact': 'Contact',
     'footer.social': 'Social',
     'footer.allRightsReserved': 'All rights reserved.',
@@ -139,6 +143,8 @@ const translations: Record<string, Record<string, string>> = {
     'contacts.formSend': 'Poslat zprávu',
     'contacts.formSuccess': 'Zpráva byla úspěšně odeslána!',
     'contacts.formError': 'Zprávu se nepodařilo odeslat.',
+    'services.viewAll': 'Zobrazit všechny služby',
+    'gallery.viewAll': 'Zobrazit celou galerii',
     'footer.contact': 'Kontakt',
     'footer.social': 'Sociální sítě',
     'footer.allRightsReserved': 'Všechna práva vyhrazena.',
@@ -170,7 +176,7 @@ export function LocaleProvider({
     try {
       const savedLocale = localStorage.getItem('locale');
       if (savedLocale && availableLocales.includes(savedLocale)) {
-        setLocaleState(savedLocale);
+        setTimeout(() => setLocaleState(savedLocale), 0);
       }
     } catch (e) {
       console.warn('localStorage is not available:', e);

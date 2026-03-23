@@ -44,7 +44,7 @@ export function LivePreviewClient({
 
   useEffect(() => {
     // Mark as mounted to avoid hydration mismatch errors
-    setIsMounted(true);
+    const timer = setTimeout(() => setIsMounted(true), 0);
 
     const handleMessage = (event: MessageEvent) => {
       // Listen for the specific update event from the parent window (admin dashboard)
@@ -58,7 +58,10 @@ export function LivePreviewClient({
 
     // Add event listener safely only on the client side
     window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      clearTimeout(timer);
+    };
   }, []);
 
   let layoutConfigArray: string[] = [];

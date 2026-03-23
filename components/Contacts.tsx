@@ -42,6 +42,7 @@ export function Contacts({ siteData, storeData }: { siteData: SiteData; storeDat
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
+            className="order-2 md:order-1"
           >
             <h2 className="text-3xl md:text-4xl font-serif text-stone-900 mb-6">{t('contacts.subtitle')}</h2>
             <p className="text-stone-600 mb-8">
@@ -97,7 +98,7 @@ export function Contacts({ siteData, storeData }: { siteData: SiteData; storeDat
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-stone-50 p-8 rounded-2xl border border-stone-100 shadow-sm"
+            className="order-1 md:order-2 bg-stone-50 p-8 rounded-2xl border border-stone-100 shadow-sm"
           >
             <h3 className="text-2xl font-bold text-stone-900 mb-6">{t('contacts.formTitle')}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">

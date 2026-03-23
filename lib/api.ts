@@ -21,7 +21,7 @@ export async function fetchStoreData(path: string, params: Record<string, string
         Authorization: `Bearer ${masterKey.trim()}`,
         'Content-Type': 'application/json'
       },
-      next: { revalidate: 10 }
+      next: { tags: [domain, `store-${domain}`, `store-${path}-${domain}`] }
     });
     
     if (!res.ok) {
@@ -56,16 +56,23 @@ export async function getStoreData(domain: string): Promise<StoreData> {
   const serviceSubcategories = categories?.filter((c: any) => c.parentId === servicesCategory?.id) || [];
   
   let servicesData: any = [];
+  
+  // 1. Fetch items for the main 'services' category
+  if (servicesCategory) {
+    const mainItems = await getItems(domain, 'services');
+    if (mainItems && mainItems.length > 0) {
+      servicesData.push({ category: servicesCategory, items: mainItems });
+    }
+  }
+
+  // 2. Fetch items for subcategories
   if (serviceSubcategories.length > 0) {
-    servicesData = await Promise.all(serviceSubcategories.map(async (sub: any) => {
+    const subData = await Promise.all(serviceSubcategories.map(async (sub: any) => {
       const items = await getItems(domain, sub.slug);
       return { category: sub, items: items || [] };
     }));
-  } else if (servicesCategory) {
-    const items = await getItems(domain, 'services');
-    if (items && items.length > 0) {
-      servicesData = [{ category: servicesCategory, items }];
-    }
+    // Append subcategories that have items
+    servicesData = [...servicesData, ...subData.filter(d => d.items.length > 0)];
   }
 
   return {

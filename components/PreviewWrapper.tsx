@@ -55,9 +55,21 @@ export function PreviewWrapper({
       <FontLoader fontFamily={siteData.fontFamily} />
       <Navbar siteData={siteData} storeData={storeData} layoutConfig={layoutConfig} />
       <main className="flex-grow">
-        {layoutConfig.map((componentName, index) => (
-          <ComponentMapper key={`${componentName}-${index}`} name={componentName} siteData={siteData} storeData={storeData} />
-        ))}
+        {layoutConfig.map((componentName, index) => {
+          let limit = undefined;
+          if (componentName === 'services') limit = 4;
+          if (componentName === 'gallery') limit = 8;
+          
+          return (
+            <ComponentMapper 
+              key={`${componentName}-${index}`} 
+              name={componentName} 
+              siteData={siteData} 
+              storeData={storeData} 
+              limit={limit}
+            />
+          );
+        })}
       </main>
       <Footer siteData={siteData} storeData={storeData} />
     </div>

@@ -5,14 +5,14 @@ import { Contacts } from './Contacts';
 import { SiteData } from '@/lib/getSiteData';
 import { StoreData } from '@/lib/api';
 
-const componentMap: Record<string, React.ComponentType<{ siteData: SiteData; storeData: StoreData }>> = {
+const componentMap: Record<string, React.ComponentType<{ siteData: SiteData; storeData: StoreData; limit?: number }>> = {
   hero: Hero,
   services: ServicesList,
   gallery: GalleryGrid,
   contacts: Contacts,
 };
 
-export function ComponentMapper({ name, siteData, storeData }: { name: string; siteData: SiteData; storeData: StoreData }) {
+export function ComponentMapper({ name, siteData, storeData, limit }: { name: string; siteData: SiteData; storeData: StoreData; limit?: number }) {
   const Component = componentMap[name];
 
   if (!Component) {
@@ -20,5 +20,5 @@ export function ComponentMapper({ name, siteData, storeData }: { name: string; s
     return null;
   }
 
-  return <Component siteData={siteData} storeData={storeData} />;
+  return <Component siteData={siteData} storeData={storeData} limit={limit} />;
 }

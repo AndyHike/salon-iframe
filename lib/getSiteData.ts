@@ -35,7 +35,7 @@ export async function getSiteData(domain: string): Promise<SiteData | null> {
         Authorization: `Bearer ${masterKey.trim()}`,
         'Content-Type': 'application/json'
       },
-      next: { revalidate: 10 }, // Cache for 10 seconds
+      next: { tags: [domain, `appearance-${domain}`] },
     });
 
     if (!res.ok) {

@@ -2,11 +2,15 @@
 
 import { SiteData } from '@/lib/getSiteData';
 import { StoreData } from '@/lib/api';
+import Link from 'next/link';
 import { useLocale } from './LocaleContext';
 import { motion } from 'motion/react';
 
-export function ServicesList({ siteData, storeData }: { siteData: SiteData; storeData: StoreData }) {
-  const servicesData = storeData.servicesData || [];
+export function ServicesList({ siteData, storeData, limit }: { siteData: SiteData; storeData: StoreData; limit?: number }) {
+  let servicesData = storeData.servicesData || [];
+  if (limit) {
+    servicesData = servicesData.slice(0, limit);
+  }
   const { locale, t } = useLocale();
   
   // @ts-ignore - servicesLayout might not be in the type yet
@@ -49,11 +53,6 @@ export function ServicesList({ siteData, storeData }: { siteData: SiteData; stor
               >
                 {group.category?.title && (
                   <h3 className={`text-2xl md:text-3xl font-serif text-stone-800 mb-8 flex items-center gap-4 ${layout === 'compact' ? 'border-b border-stone-100 pb-4' : ''}`}>
-                    {layout !== 'compact' && (
-                      <span className="w-10 h-10 rounded-full bg-[var(--primary-color)]/10 flex items-center justify-center text-[var(--primary-color)] text-sm font-bold">
-                        {index + 1}
-                      </span>
-                    )}
                     {getTitle(group.category)}
                   </h3>
                 )}
@@ -90,6 +89,17 @@ export function ServicesList({ siteData, storeData }: { siteData: SiteData; stor
                 </div>
               </motion.div>
             ))}
+          </div>
+        )}
+        
+        {limit && storeData.servicesData && storeData.servicesData.length > limit && (
+          <div className="mt-16 text-center">
+            <Link 
+              href="/services" 
+              className="inline-block px-8 py-4 rounded-full font-medium transition-colors bg-stone-900 text-white hover:bg-stone-800"
+            >
+              {t('services.viewAll')}
+            </Link>
           </div>
         )}
       </div>
