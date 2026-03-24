@@ -22,7 +22,7 @@ export async function cmsFetch<T>(
   }
 ): Promise<T | null> {
   const { domain, method = 'GET', body, tags, revalidate } = options;
-  const baseUrl = process.env.CMS_BASE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.ADMIN_API_URL || 'http://localhost:3000';
   const masterKey = process.env.SYSTEM_MASTER_KEY;
 
   if (!masterKey) {
