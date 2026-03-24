@@ -27,7 +27,7 @@ export function Hero({
   const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.4;
   const companyName = settings.companyName || 'Premium Salon & Barbershop';
 
-  const animationFloat = themeData.animationStyle === 'float' ? { y: [0, -10, 0], transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' } } : {};
+  const animationFloat: any = themeData.animationStyle === 'float' ? { y: [0, -10, 0], transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' } } : {};
   const animationInitial = themeData.animationStyle === 'reveal' ? { opacity: 0, scale: 0.95 } : { opacity: 0, y: 30 };
   const animationAnimate = themeData.animationStyle === 'reveal' ? { opacity: 1, scale: 1 } : { opacity: 1, y: 0 };
 

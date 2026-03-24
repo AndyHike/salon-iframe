@@ -28,7 +28,7 @@ export function Hero({
 
   const isSplit = themeData.heroStyle === 'split';
 
-  const textAnimation = themeData.animationStyle === 'reveal' 
+  const textAnimation: any = themeData.animationStyle === 'reveal' 
     ? { initial: { opacity: 0, x: -30 }, animate: { opacity: 1, x: 0 } } 
     : { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 } };
 
