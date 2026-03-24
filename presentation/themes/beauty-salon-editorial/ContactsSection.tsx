@@ -186,7 +186,8 @@ export function ContactsSection({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-5 bg-stone-900 text-white font-semibold tracking-widest text-sm uppercase hover:bg-stone-800 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center mt-4"
+                className="w-full py-5 bg-[var(--primary-color)] hover:opacity-90 text-white font-semibold tracking-widest text-sm uppercase transition-all disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center mt-4"
+                style={{ borderRadius: 'var(--btn-radius)' }}
               >
                 {isSubmitting ? (
                   <div className="w-5 h-5 border-[3px] border-stone-500 border-t-white rounded-full animate-spin"></div>

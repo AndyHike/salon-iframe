@@ -27,6 +27,7 @@ export function Hero({
   const companyName = settings.companyName || 'Premium Salon & Barbershop';
 
   const isSplit = themeData.heroStyle === 'split';
+  const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.4;
 
   const textAnimation: any = themeData.animationStyle === 'reveal' 
     ? { initial: { opacity: 0, x: -30 }, animate: { opacity: 1, x: 0 } } 
@@ -57,6 +58,7 @@ export function Hero({
                 <a 
                   href="#contacts"
                   className="px-8 py-4 text-white font-medium tracking-wide text-sm uppercase transition-all hover:bg-stone-800 shadow-none bg-[var(--primary-color)] inline-block"
+                  style={{ borderRadius: 'var(--btn-radius)' }}
                 >
                   {t('btn.book')}
                 </a>
@@ -79,6 +81,10 @@ export function Hero({
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${tokens.heroBackgroundImage})` }}
             ></div>
+            <div 
+              className="absolute inset-0 bg-stone-900"
+              style={{ opacity: overlayOpacity }}
+            ></div>
           </motion.div>
         </div>
       </section>
@@ -86,7 +92,6 @@ export function Hero({
   }
 
   // Fallback to a cleaner centered if no bg image or explicitly spotlight
-  const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.2;
   return (
     <section 
       id="hero"
@@ -116,6 +121,7 @@ export function Hero({
             <a 
               href="#contacts"
               className="px-10 py-5 text-white font-medium text-sm tracking-widest uppercase transition-all bg-[var(--primary-color)] hover:bg-stone-800 inline-block"
+              style={{ borderRadius: 'var(--btn-radius)' }}
             >
               {t('btn.book')}
             </a>
@@ -123,6 +129,7 @@ export function Hero({
           <a 
             href="#services"
             className={`px-10 py-5 font-medium text-sm tracking-widest uppercase transition-all inline-block ${themeData.ctaPlacement === 'hero' ? 'border border-current hover:bg-white/10' : 'text-white bg-[var(--primary-color)] hover:bg-stone-800'}`}
+            style={{ borderRadius: 'var(--btn-radius)' }}
           >
             {t('nav.services')}
           </a>

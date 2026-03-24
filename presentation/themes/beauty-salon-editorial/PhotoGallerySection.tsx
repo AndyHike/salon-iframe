@@ -117,7 +117,8 @@ export function PhotoGallerySection({
           <div className="mt-24 flex justify-center">
             <Link 
               href="/gallery" 
-              className="inline-block px-12 py-5 font-medium tracking-widest uppercase transition-all border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white"
+              className="inline-block px-12 py-5 font-medium tracking-widest uppercase transition-all bg-[var(--primary-color)] text-white hover:opacity-90 shadow-lg"
+              style={{ borderRadius: 'var(--btn-radius)' }}
             >
               {t('gallery.viewAll')}
             </Link>

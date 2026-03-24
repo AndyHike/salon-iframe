@@ -6,6 +6,15 @@
     --btn-radius: 9999px; /* default pill */
   }
 
+  /* Force the selected font everywhere */
+  html, body {
+    font-family: var(--font-site), sans-serif;
+  }
+  
+  .font-sans, .font-serif, .font-mono {
+    font-family: var(--font-site), sans-serif !important;
+  }
+
   [data-button-style="pill"] {
     --btn-radius: 9999px;
   }
