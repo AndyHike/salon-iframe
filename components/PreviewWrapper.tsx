@@ -6,7 +6,7 @@ import { Footer } from './Footer';
 import { FontLoader } from './FontLoader';
 import { normalizeAppearance } from '../cms/normalize/appearance';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '../presentation/appearance/applyTokens';
-import { sectionRegistry } from '../presentation/sections/registry';
+import { themeRegistry } from '../presentation/themes/registry';
 import { AppearanceContract, CmsSettingsResponse, CmsItem } from '../cms/types';
 
 type PageData = {
@@ -45,18 +45,21 @@ export function PreviewWrapper({
 
   const cssVars = getCssVariablesFromTokens(data.appearance.tokens);
   const fontFamily = getFontFamilyFromTokens(data.appearance.tokens);
+  
+  const themeKey = data.appearance.themeKey || 'beauty-salon-classic';
+  const resolvedTheme = themeRegistry[themeKey] || themeRegistry['beauty-salon-classic'];
 
   return (
     <div
       data-button-style={data.appearance.tokens.buttonStyle || 'pill'}
       style={cssVars}
-      className="flex flex-col min-h-screen w-full transition-colors duration-300"
+      className={`flex flex-col min-h-screen w-full transition-colors duration-300 theme-${themeKey}`}
     >
       <FontLoader fontFamily={fontFamily} />
       <Navbar appearance={data.appearance} settings={data.settings} layoutConfig={data.appearance.layout.blocks} domain={domain} />
       <main className="flex-grow">
         {data.appearance.layout.blocks.map((blockName, index) => {
-          const Component = sectionRegistry[blockName];
+          const Component = resolvedTheme[blockName];
           if (!Component) return null;
 
           let limit = undefined;
