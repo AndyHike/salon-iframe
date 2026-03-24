@@ -48,6 +48,41 @@ export function ContactsSection({
     }
   };
 
+  const renderWorkingHours = () => {
+    if (!settings.workingHours) return null;
+    
+    try {
+      const hoursData = typeof settings.workingHours === 'string' 
+        ? JSON.parse(settings.workingHours) 
+        : settings.workingHours;
+        
+      if (hoursData && hoursData.days && Array.isArray(hoursData.days)) {
+        return (
+          <div className="flex flex-col space-y-2 mt-1 w-full max-w-xs">
+            {hoursData.byAppointment && (
+              <div className="text-sm font-medium text-[var(--primary-color)] mb-1">
+                {t('contacts.byAppointment')}
+              </div>
+            )}
+            {hoursData.days.map((day: any) => (
+              <div key={day.day} className="flex justify-between text-sm text-stone-600 border-b border-stone-100 pb-1 last:border-0 last:pb-0">
+                <span className="font-medium capitalize">{t(`days.${day.day}`)}</span>
+                <span>
+                  {day.isClosed ? t('contacts.closed') : `${day.open} - ${day.close}`}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+      }
+    } catch (e) {
+      // Fallback to string representation if parsing fails
+      console.warn('Failed to parse working hours', e);
+    }
+    
+    return <p className="text-stone-600 whitespace-pre-line">{String(settings.workingHours)}</p>;
+  };
+
   return (
     <section id="contacts" className="py-24 bg-white">
       <div className="container mx-auto px-4 max-w-6xl">
@@ -121,9 +156,9 @@ export function ContactsSection({
                   <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center flex-shrink-0 text-stone-600">
                     <Clock className="w-5 h-5" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h4 className="font-medium text-stone-900 mb-1">{t('contacts.hours')}</h4>
-                    <p className="text-stone-600 whitespace-pre-line">{String(settings.workingHours)}</p>
+                    {renderWorkingHours()}
                   </div>
                 </div>
               )}

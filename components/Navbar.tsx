@@ -35,13 +35,13 @@ export function Navbar({
 
   const navLinks = layoutConfig.map(section => ({
     name: t(`nav.${section}`),
-    href: `/${domain}#${section}`
+    href: `/#${section}`
   }));
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || isOpen ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link href={`/${domain}`} className={`text-2xl font-bold tracking-tighter transition-colors ${isDarkText ? 'text-stone-900' : 'text-white drop-shadow-md'}`}>
+        <Link href="/" className={`text-2xl font-bold tracking-tighter transition-colors ${isDarkText ? 'text-stone-900' : 'text-white drop-shadow-md'}`}>
           {settings.companyName || 'Salon'}
         </Link>
 
@@ -73,7 +73,7 @@ export function Navbar({
             </div>
           )}
 
-          <Link href={`/${domain}#contacts`} className="px-5 py-2.5 text-white text-sm font-medium transition-transform hover:scale-105 shadow-md bg-[var(--primary-color)]" style={{ borderRadius: 'var(--btn-radius)' }}>
+          <Link href="/#contacts" className="px-5 py-2.5 text-white text-sm font-medium transition-transform hover:scale-105 shadow-md bg-[var(--primary-color)]" style={{ borderRadius: 'var(--btn-radius)' }}>
             {t('btn.book')}
           </Link>
         </div>
@@ -107,7 +107,7 @@ export function Navbar({
               {link.name}
             </Link>
           ))}
-          <Link href={`/${domain}#contacts`} onClick={() => setIsOpen(false)} className="px-5 py-3 text-white text-center font-medium shadow-md bg-[var(--primary-color)] mt-2" style={{ borderRadius: 'var(--btn-radius)' }}>
+          <Link href="/#contacts" onClick={() => setIsOpen(false)} className="px-5 py-3 text-white text-center font-medium shadow-md bg-[var(--primary-color)] mt-2" style={{ borderRadius: 'var(--btn-radius)' }}>
             {t('btn.book')}
           </Link>
         </div>

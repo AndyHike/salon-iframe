@@ -105,7 +105,7 @@ export function ServicesSection({
         {limit && servicesItems.length > limit && (
           <div className="mt-16 text-center">
             <Link 
-              href={`/${domain}/services`} 
+              href="/services" 
               className="inline-block px-8 py-4 rounded-full font-medium transition-colors bg-stone-900 text-white hover:bg-stone-800"
             >
               {t('services.viewAll')}

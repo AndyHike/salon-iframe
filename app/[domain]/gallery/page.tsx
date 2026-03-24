@@ -87,7 +87,7 @@ export default async function GalleryPage({
               {Array.from({ length: totalPages }).map((_, i) => (
                 <Link
                   key={i}
-                  href={`/${domain}/gallery?page=${i + 1}`}
+                  href={`/gallery?page=${i + 1}`}
                   className={`w-10 h-10 flex items-center justify-center rounded-full border transition-colors ${
                     page === i + 1 
                       ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)]' 
