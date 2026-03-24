@@ -190,7 +190,20 @@ export function ContactsSection({
                   name="name"
                   required
                   className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent outline-none transition-all bg-white"
-                  placeholder={t('contacts.formName')}
+                  placeholder={t('contacts.formNamePlaceholder')}
+                  autoComplete="name"
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-1">{t('contacts.formEmail') || 'Email'}</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent outline-none transition-all bg-white"
+                  placeholder={t('contacts.formEmailPlaceholder')}
+                  autoComplete="email"
                 />
               </div>
               <div>
@@ -201,7 +214,8 @@ export function ContactsSection({
                   name="phone"
                   required
                   className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent outline-none transition-all bg-white"
-                  placeholder="+38 (000) 000-00-00"
+                  placeholder={t('contacts.formPhonePlaceholder')}
+                  autoComplete="tel"
                 />
               </div>
               <div>
@@ -211,7 +225,7 @@ export function ContactsSection({
                   name="message"
                   rows={4}
                   className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent outline-none transition-all bg-white resize-none"
-                  placeholder={t('contacts.formMessage')}
+                  placeholder={t('contacts.formMessagePlaceholder')}
                 ></textarea>
               </div>
               <button

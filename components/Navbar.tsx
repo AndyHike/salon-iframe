@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X, Globe } from 'lucide-react';
 import { useLocale } from './LocaleContext';
 import { AppearanceContract, CmsSettingsResponse } from '../cms/types';
+import { parseThemeData } from '../presentation/theme-data/parser';
 
 export function Navbar({ 
   appearance, 
@@ -29,9 +30,13 @@ export function Navbar({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const themeData = parseThemeData(appearance.themeData);
+  const isEditorial = appearance.themeKey === 'beauty-salon-editorial';
   const hasBgImage = !!appearance.tokens.heroBackgroundImage;
-  // If menu is open on mobile, we force dark text / white bg for visibility
-  const isDarkText = scrolled || !hasBgImage || isOpen;
+  
+  // If menu is open on mobile, scrolled, or in the editorial theme, we force solid nav
+  const isSolidNav = scrolled || isOpen || isEditorial || !hasBgImage;
+  const isDarkText = isSolidNav;
 
   const navLinks = layoutConfig.map(section => ({
     name: t(`nav.${section}`),
@@ -39,7 +44,7 @@ export function Navbar({
   }));
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || isOpen ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isSolidNav ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link href="/" className={`text-2xl font-bold tracking-tighter transition-colors ${isDarkText ? 'text-stone-900' : 'text-white drop-shadow-md'}`}>
           {settings.companyName || 'Salon'}

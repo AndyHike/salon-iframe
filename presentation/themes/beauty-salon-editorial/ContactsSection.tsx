@@ -159,7 +159,20 @@ export function ContactsSection({
                   name="name"
                   required
                   className="w-full bg-transparent border-b border-stone-300 py-3 focus:outline-none focus:border-stone-900 transition-colors text-lg"
-                  placeholder="JOHN DOE"
+                  placeholder={t('contacts.formNamePlaceholder')}
+                  autoComplete="name"
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-xs uppercase tracking-widest text-stone-500 mb-2">{t('contacts.formEmail') || 'EMAIL'}</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  className="w-full bg-transparent border-b border-stone-300 py-3 focus:outline-none focus:border-stone-900 transition-colors text-lg"
+                  placeholder={t('contacts.formEmailPlaceholder')}
+                  autoComplete="email"
                 />
               </div>
               <div>
@@ -170,7 +183,8 @@ export function ContactsSection({
                   name="phone"
                   required
                   className="w-full bg-transparent border-b border-stone-300 py-3 focus:outline-none focus:border-stone-900 transition-colors text-lg"
-                  placeholder="+38 (000) 000-00-00"
+                  placeholder={t('contacts.formPhonePlaceholder')}
+                  autoComplete="tel"
                 />
               </div>
               <div>
@@ -180,7 +194,7 @@ export function ContactsSection({
                   name="message"
                   rows={4}
                   className="w-full bg-transparent border-b border-stone-300 py-3 focus:outline-none focus:border-stone-900 transition-colors text-lg resize-none"
-                  placeholder="INQUIRE ABOUT APPOINTMENT"
+                  placeholder={t('contacts.formMessagePlaceholder')}
                 ></textarea>
               </div>
               <button
