@@ -1,12 +1,10 @@
 'use client';
 
-import { SiteData } from '@/lib/getSiteData';
-import { StoreData } from '@/lib/api';
 import { useLocale } from './LocaleContext';
 import { motion } from 'motion/react';
+import { AppearanceContract, CmsSettingsResponse } from '../cms/types';
 
-export function Footer({ siteData, storeData }: { siteData: SiteData; storeData: StoreData }) {
-  const settings = storeData.settings || {};
+export function Footer({ appearance, settings }: { appearance: AppearanceContract; settings: CmsSettingsResponse['data'] }) {
   const currentYear = new Date().getFullYear();
   const { t } = useLocale();
 
@@ -20,8 +18,8 @@ export function Footer({ siteData, storeData }: { siteData: SiteData; storeData:
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h3 className="text-white text-xl font-bold mb-4">{siteData.name || 'Premium Salon'}</h3>
-            <p className="mb-4 max-w-xs">{siteData.description || 'Experience the finest grooming and beauty services tailored just for you.'}</p>
+            <h3 className="text-white text-xl font-bold mb-4">{settings.companyName || 'Premium Salon'}</h3>
+            <p className="mb-4 max-w-xs">{settings.contactName || 'Experience the finest grooming and beauty services tailored just for you.'}</p>
           </motion.div>
           
           <motion.div
@@ -46,14 +44,14 @@ export function Footer({ siteData, storeData }: { siteData: SiteData; storeData:
           >
             <h4 className="text-white font-semibold mb-4">{t('footer.social')}</h4>
             <ul className="space-y-2">
-              {settings.socialLinks?.instagram && (
-                <li><a href={settings.socialLinks.instagram} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Instagram</a></li>
+              {settings.instagramActive && settings.instagramUrl && (
+                <li><a href={settings.instagramUrl} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Instagram</a></li>
               )}
-              {settings.socialLinks?.facebook && (
-                <li><a href={settings.socialLinks.facebook} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Facebook</a></li>
+              {settings.facebookActive && settings.facebookUrl && (
+                <li><a href={settings.facebookUrl} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Facebook</a></li>
               )}
-              {settings.socialLinks?.tiktok && (
-                <li><a href={settings.socialLinks.tiktok} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">TikTok</a></li>
+              {settings.telegramActive && settings.telegramUrl && (
+                <li><a href={settings.telegramUrl} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Telegram</a></li>
               )}
             </ul>
           </motion.div>
@@ -66,7 +64,7 @@ export function Footer({ siteData, storeData }: { siteData: SiteData; storeData:
           transition={{ duration: 0.5, delay: 0.3 }}
           className="pt-8 border-t border-stone-800 text-sm text-center md:text-left flex flex-col md:flex-row justify-between items-center"
         >
-          <p>&copy; {currentYear} {siteData.name || 'Premium Salon'}. {t('footer.allRightsReserved')}</p>
+          <p>&copy; {currentYear} {settings.companyName || 'Premium Salon'}. {t('footer.allRightsReserved')}</p>
           <p className="mt-2 md:mt-0">{t('footer.poweredBy')} <span className="text-white font-semibold">Your Platform</span></p>
         </motion.div>
       </div>

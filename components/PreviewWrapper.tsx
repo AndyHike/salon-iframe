@@ -1,38 +1,41 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { SiteData } from '@/lib/getSiteData';
-import { StoreData } from '@/lib/api';
-import { ComponentMapper } from './ComponentMapper';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { FontLoader } from './FontLoader';
+import { normalizeAppearance } from '../cms/normalize/appearance';
+import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '../presentation/appearance/applyTokens';
+import { sectionRegistry } from '../presentation/sections/registry';
+import { AppearanceContract, CmsSettingsResponse, CmsItem } from '../cms/types';
+
+type PageData = {
+  settings: CmsSettingsResponse['data'];
+  appearance: AppearanceContract;
+  servicesItems: CmsItem[];
+  galleryItems: CmsItem[];
+  availableLocales: { code: string; name: string }[];
+  defaultLocale: string;
+};
 
 export function PreviewWrapper({ 
-  initialSiteData, 
-  storeData,
-  initialLayoutConfig
+  domain,
+  initialData,
 }: { 
-  initialSiteData: SiteData; 
-  storeData: StoreData;
-  initialLayoutConfig: string[];
+  domain: string;
+  initialData: PageData;
 }) {
-  const [siteData, setSiteData] = useState<SiteData>(initialSiteData);
-  const [layoutConfig, setLayoutConfig] = useState<string[]>(initialLayoutConfig);
+  const [data, setData] = useState<PageData>(initialData);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'UPDATE_APPEARANCE') {
         const payload = event.data.payload;
         
-        setSiteData(prev => ({
+        setData(prev => ({
           ...prev,
-          ...payload
+          appearance: normalizeAppearance(payload)
         }));
-
-        if (payload.layoutConfig && Array.isArray(payload.layoutConfig)) {
-          setLayoutConfig(payload.layoutConfig);
-        }
       }
     };
 
@@ -40,38 +43,40 @@ export function PreviewWrapper({
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  const buttonRadius = siteData.buttonStyle === 'pill' ? '9999px' : siteData.buttonStyle === 'square' ? '0px' : '8px';
+  const cssVars = getCssVariablesFromTokens(data.appearance.tokens);
+  const fontFamily = getFontFamilyFromTokens(data.appearance.tokens);
 
   return (
     <div
-      data-button-style={siteData.buttonStyle || 'pill'}
-      style={{
-        '--primary-color': siteData.primaryColor,
-        fontFamily: siteData.fontFamily,
-        '--btn-radius': buttonRadius,
-      } as any}
+      data-button-style={data.appearance.tokens.buttonStyle || 'pill'}
+      style={cssVars}
       className="flex flex-col min-h-screen w-full transition-colors duration-300"
     >
-      <FontLoader fontFamily={siteData.fontFamily} />
-      <Navbar siteData={siteData} storeData={storeData} layoutConfig={layoutConfig} />
+      <FontLoader fontFamily={fontFamily} />
+      <Navbar appearance={data.appearance} settings={data.settings} layoutConfig={data.appearance.layout.blocks} domain={domain} />
       <main className="flex-grow">
-        {layoutConfig.map((componentName, index) => {
+        {data.appearance.layout.blocks.map((blockName, index) => {
+          const Component = sectionRegistry[blockName];
+          if (!Component) return null;
+
           let limit = undefined;
-          if (componentName === 'services') limit = 4;
-          if (componentName === 'gallery') limit = 8;
+          if (blockName === 'services') limit = 4;
+          if (blockName === 'photoGallery') limit = 8;
           
           return (
-            <ComponentMapper 
-              key={`${componentName}-${index}`} 
-              name={componentName} 
-              siteData={siteData} 
-              storeData={storeData} 
+            <Component 
+              key={`${blockName}-${index}`} 
+              settings={data.settings}
+              appearance={data.appearance}
+              servicesItems={data.servicesItems}
+              galleryItems={data.galleryItems}
+              domain={domain}
               limit={limit}
             />
           );
         })}
       </main>
-      <Footer siteData={siteData} storeData={storeData} />
+      <Footer appearance={data.appearance} settings={data.settings} />
     </div>
   );
 }

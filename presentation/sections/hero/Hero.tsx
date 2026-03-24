@@ -1,20 +1,35 @@
 'use client';
 
-import { SiteData } from '@/lib/getSiteData';
-import { StoreData } from '@/lib/api';
-import { useLocale } from './LocaleContext';
 import { motion } from 'motion/react';
+import { useLocale } from '../../../components/LocaleContext';
+import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/types';
 
-export function Hero({ siteData, storeData }: { siteData: SiteData; storeData: StoreData }) {
-  const hasBgImage = !!siteData.heroBackgroundImage;
-  const overlayOpacity = siteData.heroOverlay !== undefined ? siteData.heroOverlay : 0.4;
+export function Hero({ 
+  settings, 
+  appearance,
+  servicesItems,
+  galleryItems,
+  domain,
+  limit
+}: { 
+  settings: CmsSettingsResponse['data']; 
+  appearance: AppearanceContract;
+  servicesItems: CmsItem[];
+  galleryItems: CmsItem[];
+  domain: string;
+  limit?: number;
+}) {
   const { t } = useLocale();
+  const tokens = appearance.tokens;
+  const hasBgImage = !!tokens.heroBackgroundImage;
+  const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.4;
+  const companyName = settings.companyName || 'Premium Salon & Barbershop';
 
   return (
     <section 
       id="hero"
       className={`relative pt-32 pb-24 flex items-center justify-center min-h-[80vh] overflow-hidden ${hasBgImage ? 'bg-stone-900' : 'bg-stone-50'}`}
-      style={hasBgImage ? { backgroundImage: `url(${siteData.heroBackgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+      style={hasBgImage ? { backgroundImage: `url(${tokens.heroBackgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
     >
       {hasBgImage ? (
         <div className="absolute inset-0 z-0 bg-black" style={{ opacity: overlayOpacity }}></div>
@@ -29,10 +44,10 @@ export function Hero({ siteData, storeData }: { siteData: SiteData; storeData: S
         className={`container mx-auto px-4 relative z-10 text-center ${hasBgImage ? 'text-white' : 'text-stone-900'}`}
       >
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif tracking-tight mb-6 drop-shadow-sm">
-          {siteData.name || 'Premium Salon & Barbershop'}
+          {companyName}
         </h1>
         <p className={`text-xl md:text-2xl mb-10 max-w-2xl mx-auto drop-shadow-sm font-light ${hasBgImage ? 'text-stone-200' : 'text-stone-600'}`}>
-          {siteData.description || 'Experience the finest grooming and beauty services tailored just for you.'}
+          {t('hero.subtitle') || 'Experience the finest grooming and beauty services tailored just for you.'}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a 

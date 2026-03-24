@@ -1,5 +1,4 @@
-import { getSiteData } from '@/lib/getSiteData';
-import { getStoreData } from '@/lib/api';
+import { loadBeautySalonHome } from '@/cms/loaders/loadBeautySalonHome';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { ClientProviders } from '@/components/ClientProviders';
@@ -7,56 +6,37 @@ import { PreviewWrapper } from '@/components/PreviewWrapper';
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
   const { domain } = await params;
-  const siteData = await getSiteData(domain);
+  const data = await loadBeautySalonHome(domain);
 
-  if (!siteData) {
+  if (!data) {
     return {
       title: 'Not Found',
     };
   }
 
   return {
-    title: siteData.name || `${domain} - Premium Services`,
-    description: siteData.description || `Welcome to ${domain}`,
+    title: data.settings.companyName || `${domain} - Premium Services`,
+    description: data.settings.contactName || `Welcome to ${domain}`,
     openGraph: {
-      title: siteData.name || `${domain} - Premium Services`,
-      description: siteData.description || `Welcome to ${domain}`,
+      title: data.settings.companyName || `${domain} - Premium Services`,
+      description: data.settings.contactName || `Welcome to ${domain}`,
     },
   };
 }
 
 export default async function DomainPage({ params }: { params: Promise<{ domain: string }> }) {
   const { domain } = await params;
-  const [siteData, storeData] = await Promise.all([
-    getSiteData(domain),
-    getStoreData(domain)
-  ]);
+  const data = await loadBeautySalonHome(domain);
 
-  if (!siteData) {
+  if (!data) {
     notFound();
   }
 
-  let layoutConfig: string[] = [];
-  try {
-    const parsed = typeof siteData.layoutConfig === 'string'
-      ? JSON.parse(siteData.layoutConfig)
-      : siteData.layoutConfig;
-    if (Array.isArray(parsed)) {
-      layoutConfig = parsed;
-    }
-  } catch (e) {
-    console.error('Failed to parse layoutConfig', e);
-  }
-
-  const availableLocales = storeData.settings?.locales || ['uk', 'en', 'cs'];
-  const defaultLocale = storeData.settings?.defaultLocale || 'uk';
-
   return (
-    <ClientProviders defaultLocale={defaultLocale} availableLocales={availableLocales}>
+    <ClientProviders defaultLocale={data.defaultLocale} availableLocales={data.availableLocales.map(l => l.code)}>
       <PreviewWrapper 
-        initialSiteData={siteData} 
-        storeData={storeData} 
-        initialLayoutConfig={layoutConfig} 
+        domain={domain}
+        initialData={data} 
       />
     </ClientProviders>
   );

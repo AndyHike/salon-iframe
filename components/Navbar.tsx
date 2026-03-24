@@ -1,12 +1,22 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Menu, X, Globe } from 'lucide-react';
-import { SiteData } from '@/lib/getSiteData';
-import { StoreData } from '@/lib/api';
 import { useLocale } from './LocaleContext';
+import { AppearanceContract, CmsSettingsResponse } from '../cms/types';
 
-export function Navbar({ siteData, storeData, layoutConfig }: { siteData: SiteData; storeData: StoreData; layoutConfig: string[] }) {
+export function Navbar({ 
+  appearance, 
+  settings, 
+  layoutConfig,
+  domain
+}: { 
+  appearance: AppearanceContract; 
+  settings: CmsSettingsResponse['data']; 
+  layoutConfig: string[];
+  domain: string;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { locale, setLocale, availableLocales, t } = useLocale();
@@ -19,28 +29,28 @@ export function Navbar({ siteData, storeData, layoutConfig }: { siteData: SiteDa
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const hasBgImage = !!siteData.heroBackgroundImage;
+  const hasBgImage = !!appearance.tokens.heroBackgroundImage;
   // If menu is open on mobile, we force dark text / white bg for visibility
   const isDarkText = scrolled || !hasBgImage || isOpen;
 
   const navLinks = layoutConfig.map(section => ({
     name: t(`nav.${section}`),
-    href: `#${section}`
+    href: `/${domain}#${section}`
   }));
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || isOpen ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <a href="#" className={`text-2xl font-bold tracking-tighter transition-colors ${isDarkText ? 'text-stone-900' : 'text-white drop-shadow-md'}`}>
-          {siteData.name || 'Salon'}
-        </a>
+        <Link href={`/${domain}`} className={`text-2xl font-bold tracking-tighter transition-colors ${isDarkText ? 'text-stone-900' : 'text-white drop-shadow-md'}`}>
+          {settings.companyName || 'Salon'}
+        </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center space-x-8">
           {navLinks.map(link => (
-            <a key={link.href} href={link.href} className={`text-sm font-medium transition-colors hover:text-[var(--primary-color)] ${isDarkText ? 'text-stone-600' : 'text-stone-100 drop-shadow-md'}`}>
+            <Link key={link.href} href={link.href} className={`text-sm font-medium transition-colors hover:text-[var(--primary-color)] ${isDarkText ? 'text-stone-600' : 'text-stone-100 drop-shadow-md'}`}>
               {link.name}
-            </a>
+            </Link>
           ))}
           
           {availableLocales.length > 1 && (
@@ -63,9 +73,9 @@ export function Navbar({ siteData, storeData, layoutConfig }: { siteData: SiteDa
             </div>
           )}
 
-          <a href="#contacts" className="px-5 py-2.5 text-white text-sm font-medium transition-transform hover:scale-105 shadow-md bg-[var(--primary-color)]" style={{ borderRadius: 'var(--btn-radius)' }}>
+          <Link href={`/${domain}#contacts`} className="px-5 py-2.5 text-white text-sm font-medium transition-transform hover:scale-105 shadow-md bg-[var(--primary-color)]" style={{ borderRadius: 'var(--btn-radius)' }}>
             {t('btn.book')}
-          </a>
+          </Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -93,13 +103,13 @@ export function Navbar({ siteData, storeData, layoutConfig }: { siteData: SiteDa
       {isOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg py-4 px-4 flex flex-col space-y-4 border-t border-stone-100">
           {navLinks.map(link => (
-            <a key={link.href} href={link.href} onClick={() => setIsOpen(false)} className="text-stone-800 font-medium py-3 border-b border-stone-100 hover:text-[var(--primary-color)] transition-colors">
+            <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className="text-stone-800 font-medium py-3 border-b border-stone-100 hover:text-[var(--primary-color)] transition-colors">
               {link.name}
-            </a>
+            </Link>
           ))}
-          <a href="#contacts" onClick={() => setIsOpen(false)} className="px-5 py-3 text-white text-center font-medium shadow-md bg-[var(--primary-color)] mt-2" style={{ borderRadius: 'var(--btn-radius)' }}>
+          <Link href={`/${domain}#contacts`} onClick={() => setIsOpen(false)} className="px-5 py-3 text-white text-center font-medium shadow-md bg-[var(--primary-color)] mt-2" style={{ borderRadius: 'var(--btn-radius)' }}>
             {t('btn.book')}
-          </a>
+          </Link>
         </div>
       )}
     </nav>

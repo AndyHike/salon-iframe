@@ -1,34 +1,26 @@
-import { getSiteData } from '@/lib/getSiteData';
-import { getStoreData } from '@/lib/api';
-import { LivePreviewClient } from './LivePreviewClient';
+import { loadBeautySalonHome } from '@/cms/loaders/loadBeautySalonHome';
+import { notFound } from 'next/navigation';
 import { ClientProviders } from '@/components/ClientProviders';
+import { PreviewWrapper } from '@/components/PreviewWrapper';
 
 export default async function PreviewPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ domain: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { domain } = await params;
-  const resolvedSearchParams = await searchParams;
-  
-  // Fetch the saved API data
-  const [siteData, storeData] = await Promise.all([
-    getSiteData(domain),
-    getStoreData(domain)
-  ]);
+  const data = await loadBeautySalonHome(domain);
 
-  const availableLocales = storeData.settings?.locales || ['uk', 'en', 'cs'];
-  const defaultLocale = storeData.settings?.defaultLocale || 'uk';
+  if (!data) {
+    notFound();
+  }
 
   return (
-    <ClientProviders defaultLocale={defaultLocale} availableLocales={availableLocales}>
+    <ClientProviders defaultLocale={data.defaultLocale} availableLocales={data.availableLocales.map(l => l.code)}>
       <div className="flex-grow flex flex-col min-h-screen">
-        <LivePreviewClient
-          initialApiData={siteData}
-          storeData={storeData}
-          searchParams={resolvedSearchParams}
+        <PreviewWrapper 
+          domain={domain}
+          initialData={data} 
         />
       </div>
     </ClientProviders>
