@@ -40,6 +40,7 @@ export function ServicesSection({
   const groups: ServiceGroup[] = [];
   const baseItems: CmsItem[] = [];
   const subGroupsMap: Record<string, ServiceGroup> = {};
+  let baseTitleStr = '';
 
   displayItems.forEach(item => {
     if (!item.categories || item.categories.length === 0) {
@@ -49,6 +50,11 @@ export function ServicesSection({
     const isBase = item.categories.some(c => c.slug === 'services');
     if (isBase) {
       baseItems.push(item);
+      if (!baseTitleStr) {
+        const cat = item.categories.find(c => c.slug === 'services');
+        const tObj = cat?.title as Record<string, string>;
+        baseTitleStr = tObj?.[locale] || tObj?.['uk'] || tObj?.['en'] || 'services';
+      }
       return;
     }
     const primaryCat = item.categories[0];
@@ -62,7 +68,9 @@ export function ServicesSection({
     subGroupsMap[catSlug].items.push(item);
   });
 
-  if (baseItems.length > 0) groups.push({ title: '', items: baseItems });
+  if (baseItems.length > 0) {
+    groups.push({ title: baseTitleStr || t('services.baseCategories', { defaultValue: 'Основні послуги' }), items: baseItems });
+  }
   Object.values(subGroupsMap).forEach(g => groups.push(g));
 
   return (
