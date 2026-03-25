@@ -66,6 +66,7 @@ export function Hero({
               <a 
                 href="#services"
                 className={`px-8 py-4 font-medium tracking-wide text-sm uppercase transition-all inline-block border border-stone-300 text-stone-900 hover:border-stone-900 ${themeData.ctaPlacement === 'hero' ? '' : 'text-white bg-[var(--primary-color)] border-transparent hover:border-transparent hover:opacity-90'}`}
+                style={{ borderRadius: 'var(--btn-radius)' }}
               >
                 {t('nav.services')}
               </a>
