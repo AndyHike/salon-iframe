@@ -48,8 +48,12 @@ export function ServicesSection({
       baseItems.push(item);
       return;
     }
-    const isBase = item.categories.some(c => c.slug === 'services');
-    if (isBase) {
+    
+    // Find the first category that is NOT the base 'services' category
+    const specificCat = item.categories.find(c => c.slug !== 'services');
+
+    if (!specificCat) {
+      // It ONLY belongs to 'services', put it in baseItems
       baseItems.push(item);
       if (!baseTitleStr) {
         const cat = item.categories.find(c => c.slug === 'services');
@@ -58,9 +62,9 @@ export function ServicesSection({
       }
       return;
     }
-    const primaryCat = item.categories[0];
-    const catSlug = primaryCat.slug;
-    const catTitleObj = primaryCat.title as Record<string, string>;
+
+    const catSlug = specificCat.slug;
+    const catTitleObj = specificCat.title as Record<string, string>;
     const catTitleStr = catTitleObj?.[locale] || catTitleObj?.['uk'] || catTitleObj?.['en'] || catSlug;
 
     if (!subGroupsMap[catSlug]) {
