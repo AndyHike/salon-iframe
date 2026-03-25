@@ -41,6 +41,7 @@ export function ServicesSection({
   const baseItems: CmsItem[] = [];
   const subGroupsMap: Record<string, ServiceGroup> = {};
   let baseTitleStr = '';
+  const defaultLocale = settings.defaultLocale || 'uk';
 
   displayItems.forEach(item => {
     if (!item.categories || item.categories.length === 0) {
@@ -57,13 +58,13 @@ export function ServicesSection({
           addedToBase = true;
           if (!baseTitleStr) {
             const tObj = cat?.title as Record<string, string>;
-            baseTitleStr = tObj?.[locale] || tObj?.['uk'] || tObj?.['en'] || 'services';
+            baseTitleStr = tObj?.[locale] || tObj?.[defaultLocale] || '';
           }
         }
       } else {
         const catSlug = cat.slug;
         const catTitleObj = cat.title as Record<string, string>;
-        const catTitleStr = catTitleObj?.[locale] || catTitleObj?.['uk'] || catTitleObj?.['en'] || catSlug;
+        const catTitleStr = catTitleObj?.[locale] || catTitleObj?.[defaultLocale] || '';
 
         if (!subGroupsMap[catSlug]) {
           subGroupsMap[catSlug] = { title: catTitleStr, items: [] };
@@ -143,7 +144,7 @@ export function ServicesSection({
                           </h4>
                           <div className="flex-grow border-b-2 border-dotted border-stone-200 mx-4 opacity-40"></div>
                           <span className="text-lg md:text-xl font-semibold text-stone-900 whitespace-nowrap">
-                            {service.price ? `${service.price} ₴` : t('services.priceOnRequest')}
+                            {service.price ? `${service.price} Kč` : t('services.priceOnRequest')}
                           </span>
                         </div>
                         {getDescription(service) && (
