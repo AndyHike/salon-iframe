@@ -48,7 +48,7 @@ export default async function ServicesPage({
 
   const { settings, appearance } = bootstrap;
 
-  const servicesRes = await cmsFetch<CmsItemsResponse>(`/api/public/v1/items?categorySlug=services&limit=${limit}&offset=${offset}`, {
+  const servicesRes = await cmsFetch<CmsItemsResponse>(`/api/public/v1/items?categorySlug=services&include=categories&limit=${limit}&offset=${offset}`, {
     domain,
     tags: [domain, `store-${domain}:services`],
   });

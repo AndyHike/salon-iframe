@@ -9,7 +9,7 @@ export async function loadBeautySalonHome(domain: string) {
   const { settings, appearance } = bootstrap;
 
   const [servicesRes, galleryRes] = await Promise.all([
-    cmsFetch<CmsItemsResponse>('/api/public/v1/items?categorySlug=services&limit=100', {
+    cmsFetch<CmsItemsResponse>('/api/public/v1/items?categorySlug=services&include=categories&limit=100', {
       domain,
       tags: [domain, `store-${domain}:services`],
     }),

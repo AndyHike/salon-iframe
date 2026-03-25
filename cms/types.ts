@@ -40,6 +40,17 @@ export type CmsSettingsResponse = {
   };
 };
 
+export type CmsItemCategory = {
+  id: string;
+  slug: string;
+  title: Partial<Record<"uk" | "en" | "cs", string>> | Record<string, string>;
+  ancestors?: Array<{
+    id: string;
+    slug: string;
+    title: Partial<Record<"uk" | "en" | "cs", string>> | Record<string, string>;
+  }>;
+};
+
 export type CmsItem = {
   id: string;
   title: Record<string, string>;
@@ -48,6 +59,7 @@ export type CmsItem = {
   content?: Record<string, string> | null;
   price?: string | number | null;
   attributes?: Record<string, unknown> | null;
+  categories?: CmsItemCategory[];
   images?: Array<{
     id: string;
     filePath: string;

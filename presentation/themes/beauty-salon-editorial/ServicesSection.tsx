@@ -37,6 +37,35 @@ export function ServicesSection({
   const surfaceClass = isPaper ? 'border border-stone-300 bg-[#fdfbf7]' : 'border border-stone-200 bg-white';
   const spacingClass = themeData.sectionSpacing === 'airy' ? 'py-32' : 'py-20';
 
+  type ServiceGroup = { title: string; items: CmsItem[] };
+  const groups: ServiceGroup[] = [];
+  const baseItems: CmsItem[] = [];
+  const subGroupsMap: Record<string, ServiceGroup> = {};
+
+  displayItems.forEach(item => {
+    if (!item.categories || item.categories.length === 0) {
+      baseItems.push(item);
+      return;
+    }
+    const isBase = item.categories.some(c => c.slug === 'services');
+    if (isBase) {
+      baseItems.push(item);
+      return;
+    }
+    const primaryCat = item.categories[0];
+    const catSlug = primaryCat.slug;
+    const catTitleObj = primaryCat.title as Record<string, string>;
+    const catTitleStr = catTitleObj?.[locale] || catTitleObj?.['uk'] || catTitleObj?.['en'] || catSlug;
+
+    if (!subGroupsMap[catSlug]) {
+      subGroupsMap[catSlug] = { title: catTitleStr, items: [] };
+    }
+    subGroupsMap[catSlug].items.push(item);
+  });
+
+  if (baseItems.length > 0) groups.push({ title: '', items: baseItems });
+  Object.values(subGroupsMap).forEach(g => groups.push(g));
+
   return (
     <section id="services" className={`${spacingClass} bg-stone-50 border-t border-stone-200`}>
       <div className="container mx-auto px-4">
@@ -56,52 +85,58 @@ export function ServicesSection({
         {displayItems.length === 0 ? (
           <p className="text-center text-stone-500 uppercase tracking-widest text-sm">{t('services.empty')}</p>
         ) : (
-          <div className={`max-w-7xl mx-auto ${variant === 'grid' || variant === 'cards' ? 'grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16' : ''}`}>
-            <motion.div 
-              initial={themeData.animationStyle === 'reveal' ? { opacity: 0, y: 40 } : { opacity: 0, y: 20 }}
-              whileInView={themeData.animationStyle === 'reveal' ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className={`
-                ${variant === 'cards' ? `${surfaceClass} p-8 md:p-12` : ''}
-                ${variant === 'grid' ? 'bg-transparent' : ''}
-                ${variant === 'list' ? 'max-w-5xl mx-auto' : ''}
-                ${variant === 'compact' ? `max-w-4xl mx-auto ${surfaceClass} p-8` : ''}
-                w-full
-              `}
-            >
-              <div className={`
-                ${variant === 'grid' ? 'grid grid-cols-1 gap-12' : ''}
-                ${variant === 'list' ? 'space-y-12' : ''}
-                ${variant === 'cards' ? 'space-y-8' : ''}
-                ${variant === 'compact' ? 'space-y-0' : ''}
-              `}>
-                {displayItems.map((service, index) => (
-                  <div 
-                    key={service.id} 
-                    className={`
-                      flex flex-col group/item
-                      ${variant === 'compact' ? 'border-b border-stone-200 py-6 last:border-0' : ''}
-                      ${variant === 'list' ? 'border-b border-stone-200 pb-12 last:border-0' : ''}
-                    `}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-3 w-full">
-                      <h4 className="text-2xl font-serif text-stone-900 group-hover/item:text-[var(--primary-color)] transition-colors mb-2 sm:mb-0">
-                        {getTitle(service)}
-                      </h4>
-                      <span className="text-lg font-medium text-stone-900 tracking-wider">
-                        {service.price ? `${service.price} ₴` : t('services.priceOnRequest')}
-                      </span>
-                    </div>
-                    {getDescription(service) && (
-                      <p className="text-stone-500 font-light text-base md:text-lg max-w-2xl leading-relaxed">
-                        {getDescription(service)}
-                      </p>
-                    )}
+          <div className="max-w-7xl mx-auto space-y-24">
+            {groups.map((group, idx) => (
+              <div key={idx} className="w-full">
+                {group.title && (
+                  <h3 className="text-3xl md:text-4xl font-serif text-stone-900 mb-10 border-b border-stone-200 pb-4">{group.title}</h3>
+                )}
+                <motion.div 
+                  initial={themeData.animationStyle === 'reveal' ? { opacity: 0, y: 40 } : { opacity: 0, y: 20 }}
+                  whileInView={themeData.animationStyle === 'reveal' ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: idx * 0.1 }}
+                  className={`
+                    ${variant === 'cards' ? `${surfaceClass} p-8 md:p-12` : ''}
+                    ${variant === 'grid' ? 'bg-transparent' : ''}
+                    ${variant === 'list' ? 'max-w-5xl mx-auto' : ''}
+                    ${variant === 'compact' ? `max-w-4xl mx-auto ${surfaceClass} p-8` : ''}
+                    w-full
+                  `}
+                >
+                  <div className={`
+                    ${variant === 'grid' || variant === 'cards' ? 'grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16' : ''}
+                    ${variant === 'list' ? 'space-y-12' : ''}
+                    ${variant === 'compact' ? 'space-y-0' : ''}
+                  `}>
+                    {group.items.map((service) => (
+                      <div 
+                        key={service.id} 
+                        className={`
+                          flex flex-col group/item
+                          ${variant === 'compact' ? 'border-b border-stone-200 py-6 last:border-0' : ''}
+                          ${variant === 'list' ? 'border-b border-stone-200 pb-12 last:border-0' : ''}
+                        `}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-3 w-full">
+                          <h4 className="text-2xl font-serif text-stone-900 group-hover/item:text-[var(--primary-color)] transition-colors mb-2 sm:mb-0">
+                            {getTitle(service)}
+                          </h4>
+                          <span className="text-lg font-medium text-stone-900 tracking-wider">
+                            {service.price ? `${service.price} ₴` : t('services.priceOnRequest')}
+                          </span>
+                        </div>
+                        {getDescription(service) && (
+                          <p className="text-stone-500 font-light text-base md:text-lg max-w-2xl leading-relaxed">
+                            {getDescription(service)}
+                          </p>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </motion.div>
               </div>
-            </motion.div>
+            ))}
           </div>
         )}
       </div>
