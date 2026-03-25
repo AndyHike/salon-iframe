@@ -69,7 +69,7 @@ export function ServicesSection({
   });
 
   if (baseItems.length > 0) {
-    groups.push({ title: baseTitleStr || t('services.baseCategories', { defaultValue: 'Основні послуги' }), items: baseItems });
+    groups.push({ title: baseTitleStr || t('services.baseCategories'), items: baseItems });
   }
   Object.values(subGroupsMap).forEach(g => groups.push(g));
 
