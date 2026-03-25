@@ -44,38 +44,43 @@ export function ServicesSection({
 
   displayItems.forEach(item => {
     if (!item.categories || item.categories.length === 0) {
-      baseItems.push(item);
+      if (!baseItems.includes(item)) baseItems.push(item);
       return;
     }
     
-    // Find the first category that is NOT the base 'services' category
-    const specificCat = item.categories.find(c => c.slug !== 'services');
+    let addedToBase = false;
 
-    if (!specificCat) {
-      // It ONLY belongs to 'services', put it in baseItems
-      baseItems.push(item);
-      if (!baseTitleStr) {
-        const cat = item.categories.find(c => c.slug === 'services');
-        const tObj = cat?.title as Record<string, string>;
-        baseTitleStr = tObj?.[locale] || tObj?.['uk'] || tObj?.['en'] || 'services';
+    item.categories.forEach(cat => {
+      if (cat.slug === 'services') {
+        if (!addedToBase) {
+          baseItems.push(item);
+          addedToBase = true;
+          if (!baseTitleStr) {
+            const tObj = cat?.title as Record<string, string>;
+            baseTitleStr = tObj?.[locale] || tObj?.['uk'] || tObj?.['en'] || 'services';
+          }
+        }
+      } else {
+        const catSlug = cat.slug;
+        const catTitleObj = cat.title as Record<string, string>;
+        const catTitleStr = catTitleObj?.[locale] || catTitleObj?.['uk'] || catTitleObj?.['en'] || catSlug;
+
+        if (!subGroupsMap[catSlug]) {
+          subGroupsMap[catSlug] = { title: catTitleStr, items: [] };
+        }
+        if (!subGroupsMap[catSlug].items.includes(item)) {
+          subGroupsMap[catSlug].items.push(item);
+        }
       }
-      return;
-    }
-
-    const catSlug = specificCat.slug;
-    const catTitleObj = specificCat.title as Record<string, string>;
-    const catTitleStr = catTitleObj?.[locale] || catTitleObj?.['uk'] || catTitleObj?.['en'] || catSlug;
-
-    if (!subGroupsMap[catSlug]) {
-      subGroupsMap[catSlug] = { title: catTitleStr, items: [] };
-    }
-    subGroupsMap[catSlug].items.push(item);
+    });
   });
 
   if (baseItems.length > 0) {
     groups.push({ title: baseTitleStr || t('services.baseCategories'), items: baseItems });
   }
-  Object.values(subGroupsMap).forEach(g => groups.push(g));
+  Object.values(subGroupsMap).forEach(g => {
+    if (g.items.length > 0) groups.push(g);
+  });
 
   return (
     <section id="services" className={`${spacingClass} bg-stone-50`}>
@@ -94,17 +99,23 @@ export function ServicesSection({
         {displayItems.length === 0 ? (
           <p className="text-center text-stone-500">{t('services.empty')}</p>
         ) : (
-          <div className="max-w-7xl mx-auto space-y-20">
+          <div className="max-w-7xl mx-auto space-y-24">
             {groups.map((group, idx) => (
               <div key={idx} className="w-full">
                 {group.title && (
-                  <h3 className="text-2xl md:text-3xl font-serif text-stone-800 mb-8 text-center">{group.title}</h3>
+                  <div className="flex flex-col items-center mb-12 sm:mb-16 w-full px-4">
+                    <div className="flex items-center w-full max-w-3xl">
+                      <div className="h-px bg-stone-200 flex-1"></div>
+                      <h3 className="text-3xl md:text-4xl font-serif text-stone-800 text-center px-6 sm:px-10 tracking-tight">{group.title}</h3>
+                      <div className="h-px bg-stone-200 flex-1"></div>
+                    </div>
+                  </div>
                 )}
                 <motion.div 
                   initial={themeData.animationStyle === 'reveal' ? { opacity: 0, scale: 0.95 } : { opacity: 0, y: 20 }}
                   whileInView={themeData.animationStyle === 'reveal' ? { opacity: 1, scale: 1 } : { opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: idx * 0.1 }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
                   className={`
                     ${variant === 'cards' ? `${surfaceClass} p-8 rounded-3xl` : ''}
                     ${variant === 'grid' ? 'bg-transparent' : ''}
@@ -117,9 +128,9 @@ export function ServicesSection({
                     ${variant === 'grid' || variant === 'cards' ? 'grid grid-cols-1 lg:grid-cols-2 gap-8' : 'flex flex-col space-y-6'}
                     ${variant === 'compact' ? '!space-y-4' : ''}
                   `}>
-                    {group.items.map((service) => (
+                    {group.items.map((service, serviceIdx) => (
                       <div 
-                        key={service.id} 
+                        key={`${service.id}-${serviceIdx}`} 
                         className={`
                           flex flex-col group/item transition-all duration-300 w-full
                           ${variant === 'cards' ? 'p-4 hover:bg-stone-50 rounded-2xl' : ''}
