@@ -2,6 +2,7 @@ import { loadBeautySalonHome } from '@/cms/loaders/loadBeautySalonHome';
 import { notFound } from 'next/navigation';
 import { ClientProviders } from '@/components/ClientProviders';
 import { PreviewWrapper } from '@/components/PreviewWrapper';
+import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 
 export default async function PreviewPage({
   params,
@@ -13,6 +14,10 @@ export default async function PreviewPage({
 
   if (!data) {
     notFound();
+  }
+
+  if (data.kind === 'blocked') {
+    return renderAvailabilityPage({ availability: data.availability, domain });
   }
 
   return (

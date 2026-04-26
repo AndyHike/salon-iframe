@@ -14,6 +14,28 @@ export type AppearanceContract = {
   themeData: Record<string, unknown>;
 };
 
+export type SiteAvailabilityCode =
+  | 'STORE_SUSPENDED'
+  | 'SITE_MAINTENANCE'
+  | 'SITE_TEMPORARILY_CLOSED';
+
+export type SiteAvailabilityMode =
+  | 'SUSPENDED'
+  | 'MAINTENANCE'
+  | 'TEMPORARILY_CLOSED'
+  | string;
+
+export type SiteAvailability = {
+  status: 403;
+  success: false;
+  code: SiteAvailabilityCode;
+  mode: SiteAvailabilityMode | null;
+  source: string | null;
+  message: string | null;
+  until: string | null;
+  error: string | null;
+};
+
 export type CmsSettingsResponse = {
   success: boolean;
   data: {
@@ -103,4 +125,13 @@ export type CmsCategory = {
 export type CmsCategoriesResponse = {
   success: boolean;
   data: CmsCategory[];
+};
+
+export type BeautySalonPageData = {
+  settings: CmsSettingsResponse['data'];
+  appearance: AppearanceContract;
+  servicesItems: CmsItem[];
+  galleryItems: CmsItem[];
+  availableLocales: Array<{ code: string; name: string }>;
+  defaultLocale: string;
 };

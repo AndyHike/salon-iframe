@@ -6,17 +6,10 @@ import { Footer } from './Footer';
 import { FontLoader } from './FontLoader';
 import { normalizeAppearance } from '../cms/normalize/appearance';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '../presentation/appearance/applyTokens';
-import { themeRegistry } from '../presentation/themes/registry';
-import { AppearanceContract, CmsSettingsResponse, CmsItem } from '../cms/types';
+import { resolveThemeDefinition } from '../presentation/themes/registry';
+import type { BeautySalonPageData } from '../cms/types';
 
-type PageData = {
-  settings: CmsSettingsResponse['data'];
-  appearance: AppearanceContract;
-  servicesItems: CmsItem[];
-  galleryItems: CmsItem[];
-  availableLocales: { code: string; name: string }[];
-  defaultLocale: string;
-};
+export type PageData = BeautySalonPageData;
 
 export function PreviewWrapper({ 
   domain,
@@ -47,19 +40,19 @@ export function PreviewWrapper({
   const fontFamily = getFontFamilyFromTokens(data.appearance.tokens);
   
   const themeKey = data.appearance.themeKey || 'beauty-salon-classic';
-  const resolvedTheme = themeRegistry[themeKey] || themeRegistry['beauty-salon-classic'];
+  const resolvedTheme = resolveThemeDefinition(themeKey);
 
   return (
     <div
       data-button-style={data.appearance.tokens.buttonStyle || 'pill'}
       style={cssVars}
-      className={`flex flex-col min-h-screen w-full transition-colors duration-300 theme-${themeKey}`}
+      className={`flex flex-col min-h-screen w-full transition-colors duration-300 theme-${resolvedTheme.key}`}
     >
       <FontLoader fontFamily={fontFamily} />
       <Navbar appearance={data.appearance} settings={data.settings} layoutConfig={data.appearance.layout.blocks} domain={domain} />
       <main className="flex-grow">
         {data.appearance.layout.blocks.map((blockName, index) => {
-          const Component = resolvedTheme[blockName];
+          const Component = resolvedTheme.sections[blockName];
           if (!Component) return null;
 
           let limit = undefined;

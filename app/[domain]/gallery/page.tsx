@@ -1,15 +1,16 @@
 import Link from 'next/link';
 import { loadSiteBootstrap } from '@/cms/loaders/loadSiteBootstrap';
-import { cmsFetch } from '@/cms/client';
+import { cmsFetchResult } from '@/cms/client';
 import { CmsItemsResponse, CmsItem } from '@/cms/types';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { ClientProviders } from '@/components/ClientProviders';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 import { FontLoader } from '@/components/FontLoader';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '@/presentation/appearance/applyTokens';
-import { PhotoGallerySection } from '@/presentation/sections/photoGallery/PhotoGallerySection';
+import { resolveThemeDefinition } from '@/presentation/themes/registry';
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
   const { domain } = await params;
@@ -18,6 +19,12 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   if (!bootstrap) {
     return {
       title: 'Not Found',
+    };
+  }
+
+  if (bootstrap.kind === 'blocked') {
+    return {
+      title: `Site unavailable | ${domain}`,
     };
   }
 
@@ -46,15 +53,24 @@ export default async function GalleryPage({
     notFound();
   }
 
+  if (bootstrap.kind === 'blocked') {
+    return renderAvailabilityPage({ availability: bootstrap.availability, domain });
+  }
+
   const { settings, appearance } = bootstrap;
 
-  const galleryRes = await cmsFetch<CmsItemsResponse>(`/api/public/v1/items?categorySlug=gallery&limit=${limit}&offset=${offset}`, {
+  const galleryRes = await cmsFetchResult<CmsItemsResponse>(`/api/public/v1/items?categorySlug=gallery&limit=${limit}&offset=${offset}`, {
     domain,
     tags: [domain, `store-${domain}:gallery`],
   });
 
-  const galleryItems: CmsItem[] = galleryRes?.success && galleryRes.data ? galleryRes.data : [];
-  const totalItems = galleryRes?.success && galleryRes.meta?.total ? galleryRes.meta.total : galleryItems.length;
+  if (!galleryRes.ok && galleryRes.availability) {
+    return renderAvailabilityPage({ availability: galleryRes.availability, domain });
+  }
+
+  const galleryData = galleryRes.ok ? galleryRes.data : null;
+  const galleryItems: CmsItem[] = galleryData?.success && galleryData.data ? galleryData.data : [];
+  const totalItems = galleryData?.success && galleryData.meta?.total ? galleryData.meta.total : galleryItems.length;
   const totalPages = Math.ceil(totalItems / limit);
 
   const availableLocales = settings.availableLocales || [{ code: 'uk', name: 'Українська' }];
@@ -62,18 +78,20 @@ export default async function GalleryPage({
 
   const cssVars = getCssVariablesFromTokens(appearance.tokens);
   const fontFamily = getFontFamilyFromTokens(appearance.tokens);
+  const resolvedTheme = resolveThemeDefinition(appearance.themeKey);
+  const GalleryRenderer = resolvedTheme.sections.photoGallery;
 
   return (
     <ClientProviders defaultLocale={defaultLocale} availableLocales={availableLocales.map(l => l.code)}>
       <div
         data-button-style={appearance.tokens.buttonStyle || 'pill'}
         style={cssVars}
-        className="flex flex-col min-h-screen w-full transition-colors duration-300"
+        className={`flex flex-col min-h-screen w-full transition-colors duration-300 theme-${resolvedTheme.key}`}
       >
         <FontLoader fontFamily={fontFamily} />
         <Navbar appearance={appearance} settings={settings} layoutConfig={appearance.layout.blocks} domain={domain} />
         <main className="flex-grow pt-24">
-          <PhotoGallerySection 
+          <GalleryRenderer 
             settings={settings}
             appearance={appearance}
             servicesItems={[]}

@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  return NextResponse.rewrite(new URL(`/${hostname}${url.pathname}`, request.url));
+  return NextResponse.rewrite(new URL(`/${hostname}${url.pathname}${url.search}`, request.url));
 }
 
 export const config = {

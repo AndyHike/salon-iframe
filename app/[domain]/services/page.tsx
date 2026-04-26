@@ -1,15 +1,16 @@
 import Link from 'next/link';
 import { loadSiteBootstrap } from '@/cms/loaders/loadSiteBootstrap';
-import { cmsFetch } from '@/cms/client';
+import { cmsFetchResult } from '@/cms/client';
 import { CmsItemsResponse, CmsItem } from '@/cms/types';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { ClientProviders } from '@/components/ClientProviders';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 import { FontLoader } from '@/components/FontLoader';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '@/presentation/appearance/applyTokens';
-import { ServicesSection } from '@/presentation/sections/services/ServicesSection';
+import { resolveThemeDefinition } from '@/presentation/themes/registry';
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
   const { domain } = await params;
@@ -18,6 +19,12 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   if (!bootstrap) {
     return {
       title: 'Not Found',
+    };
+  }
+
+  if (bootstrap.kind === 'blocked') {
+    return {
+      title: `Site unavailable | ${domain}`,
     };
   }
 
@@ -46,15 +53,24 @@ export default async function ServicesPage({
     notFound();
   }
 
+  if (bootstrap.kind === 'blocked') {
+    return renderAvailabilityPage({ availability: bootstrap.availability, domain });
+  }
+
   const { settings, appearance } = bootstrap;
 
-  const servicesRes = await cmsFetch<CmsItemsResponse>(`/api/public/v1/items?categorySlug=services&include=categories&limit=${limit}&offset=${offset}`, {
+  const servicesRes = await cmsFetchResult<CmsItemsResponse>(`/api/public/v1/items?categorySlug=services&include=categories&limit=${limit}&offset=${offset}`, {
     domain,
     tags: [domain, `store-${domain}:services`],
   });
 
-  const servicesItems: CmsItem[] = servicesRes?.success && servicesRes.data ? servicesRes.data : [];
-  const totalItems = servicesRes?.success && servicesRes.meta?.total ? servicesRes.meta.total : servicesItems.length;
+  if (!servicesRes.ok && servicesRes.availability) {
+    return renderAvailabilityPage({ availability: servicesRes.availability, domain });
+  }
+
+  const servicesData = servicesRes.ok ? servicesRes.data : null;
+  const servicesItems: CmsItem[] = servicesData?.success && servicesData.data ? servicesData.data : [];
+  const totalItems = servicesData?.success && servicesData.meta?.total ? servicesData.meta.total : servicesItems.length;
   const totalPages = Math.ceil(totalItems / limit);
 
   const availableLocales = settings.availableLocales || [{ code: 'uk', name: 'Українська' }];
@@ -62,18 +78,20 @@ export default async function ServicesPage({
 
   const cssVars = getCssVariablesFromTokens(appearance.tokens);
   const fontFamily = getFontFamilyFromTokens(appearance.tokens);
+  const resolvedTheme = resolveThemeDefinition(appearance.themeKey);
+  const ServicesRenderer = resolvedTheme.sections.services;
 
   return (
     <ClientProviders defaultLocale={defaultLocale} availableLocales={availableLocales.map(l => l.code)}>
       <div
         data-button-style={appearance.tokens.buttonStyle || 'pill'}
         style={cssVars}
-        className="flex flex-col min-h-screen w-full transition-colors duration-300"
+        className={`flex flex-col min-h-screen w-full transition-colors duration-300 theme-${resolvedTheme.key}`}
       >
         <FontLoader fontFamily={fontFamily} />
         <Navbar appearance={appearance} settings={settings} layoutConfig={appearance.layout.blocks} domain={domain} />
         <main className="flex-grow pt-24">
-          <ServicesSection 
+          <ServicesRenderer 
             settings={settings}
             appearance={appearance}
             servicesItems={servicesItems}

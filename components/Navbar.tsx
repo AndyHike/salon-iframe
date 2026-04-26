@@ -1,11 +1,12 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element -- Admin logoUrl can point to arbitrary external hosts. */
+
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Menu, X, Globe } from 'lucide-react';
 import { useLocale } from './LocaleContext';
 import { AppearanceContract, CmsSettingsResponse } from '../cms/types';
-import { parseThemeData } from '../presentation/theme-data/parser';
 
 export function Navbar({ 
   appearance, 
@@ -30,12 +31,12 @@ export function Navbar({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const themeData = parseThemeData(appearance.themeData);
   const isEditorial = appearance.themeKey === 'beauty-salon-editorial';
+  const isMinimal = appearance.themeKey === 'beauty-salon-minimal';
   const hasBgImage = !!appearance.tokens.heroBackgroundImage;
   
   // If menu is open on mobile, scrolled, or in the editorial theme, we force solid nav
-  const isSolidNav = scrolled || isOpen || isEditorial || !hasBgImage;
+  const isSolidNav = scrolled || isOpen || isEditorial || isMinimal || !hasBgImage;
   const isDarkText = isSolidNav;
 
   const navLinks = layoutConfig.map(section => ({
@@ -46,8 +47,15 @@ export function Navbar({
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isSolidNav ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link href="/" className={`text-2xl font-bold tracking-tighter transition-colors ${isDarkText ? 'text-stone-900' : 'text-white drop-shadow-md'}`}>
-          {settings.companyName || 'Salon'}
+        <Link href="/" className={`flex min-w-0 items-center gap-3 text-2xl font-bold tracking-tighter transition-colors ${isDarkText ? 'text-stone-900' : 'text-white drop-shadow-md'}`}>
+          {appearance.tokens.logoUrl && (
+            <img
+              src={appearance.tokens.logoUrl}
+              alt={`${settings.companyName || 'Salon'} logo`}
+              className="h-8 w-auto max-w-[120px] shrink-0 object-contain"
+            />
+          )}
+          <span className="truncate">{settings.companyName || 'Salon'}</span>
         </Link>
 
         {/* Desktop Nav */}
