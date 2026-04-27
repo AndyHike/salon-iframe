@@ -61,6 +61,10 @@ export function PreviewWrapper({
     focusContactForm();
   }, [data.defaultLocale, data.settings.defaultLocale, focusContactForm, locale, t]);
 
+  const handleAppointmentRequestComplete = useCallback(() => {
+    setSelectedService(null);
+  }, []);
+
   useEffect(() => {
     const serviceId = new URLSearchParams(window.location.search).get('serviceId');
     if (!serviceId) return;
@@ -115,6 +119,7 @@ export function PreviewWrapper({
               limit={limit}
               selectedService={selectedService}
               onRequestService={handleRequestService}
+              onAppointmentRequestComplete={handleAppointmentRequestComplete}
             />
           );
         })}

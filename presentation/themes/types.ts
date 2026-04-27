@@ -11,6 +11,7 @@ export type ThemeSectionProps = {
   limit?: number;
   selectedService?: AppointmentServiceSelection | null;
   onRequestService?: (service: CmsItem) => void;
+  onAppointmentRequestComplete?: () => void;
 };
 
 export type BeautySalonThemeDefinition = {

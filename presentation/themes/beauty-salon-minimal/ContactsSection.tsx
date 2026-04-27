@@ -8,23 +8,33 @@ import { useLocale } from '../../../components/LocaleContext';
 import { AppointmentFields } from '../../appointments/AppointmentFields';
 import type { ThemeSectionProps } from '../types';
 
-export function ContactsSection({ settings, servicesItems, domain, selectedService }: ThemeSectionProps) {
+export function ContactsSection({
+  settings,
+  servicesItems,
+  domain,
+  selectedService,
+  onAppointmentRequestComplete,
+}: ThemeSectionProps) {
   const { t } = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [lastSubmitWasAppointment, setLastSubmitWasAppointment] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
+    const wasAppointmentRequest = Boolean(selectedService);
 
     const formData = new FormData(event.currentTarget);
 
     try {
       const result = await submitContactForm(domain, formData);
       if (result.success) {
+        setLastSubmitWasAppointment(wasAppointmentRequest);
         setSubmitStatus('success');
         event.currentTarget.reset();
+        onAppointmentRequestComplete?.();
       } else {
         setSubmitStatus('error');
       }
@@ -186,13 +196,15 @@ export function ContactsSection({ settings, servicesItems, domain, selectedServi
                 placeholder={t('contacts.formPhonePlaceholder')}
               />
             </label>
-            <AppointmentFields
-              key={selectedService?.serviceId ?? 'contact-form-service'}
-              servicesItems={servicesItems}
-              settings={settings}
-              selectedService={selectedService}
-              variant="minimal"
-            />
+            {selectedService && (
+              <AppointmentFields
+                key={selectedService.serviceId}
+                servicesItems={servicesItems}
+                settings={settings}
+                selectedService={selectedService}
+                variant="minimal"
+              />
+            )}
             <label className="grid gap-2 text-sm font-medium text-stone-600">
               {t('contacts.formMessage')}
               <textarea
@@ -209,11 +221,15 @@ export function ContactsSection({ settings, servicesItems, domain, selectedServi
             className="mt-6 inline-flex w-full items-center justify-center bg-[var(--primary-color)] px-6 py-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             style={{ borderRadius: 'var(--btn-radius)' }}
           >
-            {isSubmitting ? t('contacts.formSending') : t('contacts.formSendRequest')}
+            {isSubmitting
+              ? t('contacts.formSending')
+              : selectedService
+                ? t('contacts.formSendRequest')
+                : t('contacts.formSend')}
           </button>
           {submitStatus === 'success' && (
-            <p className="mt-4 border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-              {t('contacts.formSuccess')}
+            <p className="mt-4 border border-emerald-700 bg-emerald-600 px-4 py-3 text-sm font-medium text-white shadow-sm">
+              {lastSubmitWasAppointment ? t('contacts.formAppointmentSuccess') : t('contacts.formSuccess')}
             </p>
           )}
           {submitStatus === 'error' && (

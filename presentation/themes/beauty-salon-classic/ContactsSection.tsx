@@ -18,6 +18,7 @@ export function ContactsSection({
   domain,
   limit,
   selectedService,
+  onAppointmentRequestComplete,
 }: { 
   settings: CmsSettingsResponse['data']; 
   appearance: AppearanceContract;
@@ -26,10 +27,12 @@ export function ContactsSection({
   domain: string;
   limit?: number;
   selectedService?: AppointmentServiceSelection | null;
+  onAppointmentRequestComplete?: () => void;
 }) {
   const { t } = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [lastSubmitWasAppointment, setLastSubmitWasAppointment] = useState(false);
   const themeData = parseThemeData(appearance.themeData);
 
   const isPaper = themeData.surfaceStyle === 'paper';
@@ -40,14 +43,17 @@ export function ContactsSection({
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
+    const wasAppointmentRequest = Boolean(selectedService);
 
     const formData = new FormData(e.currentTarget);
     
     try {
       const result = await submitContactForm(domain, formData);
       if (result.success) {
+        setLastSubmitWasAppointment(wasAppointmentRequest);
         setSubmitStatus('success');
         (e.target as HTMLFormElement).reset();
+        onAppointmentRequestComplete?.();
       } else {
         setSubmitStatus('error');
       }
@@ -221,13 +227,15 @@ export function ContactsSection({
                   autoComplete="tel"
                 />
               </div>
-              <AppointmentFields
-                key={selectedService?.serviceId ?? 'contact-form-service'}
-                servicesItems={servicesItems}
-                settings={settings}
-                selectedService={selectedService}
-                variant="soft"
-              />
+              {selectedService && (
+                <AppointmentFields
+                  key={selectedService.serviceId}
+                  servicesItems={servicesItems}
+                  settings={settings}
+                  selectedService={selectedService}
+                  variant="soft"
+                />
+              )}
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-stone-700 mb-1">{t('contacts.formMessage')}</label>
                 <textarea
@@ -247,13 +255,13 @@ export function ContactsSection({
                 {isSubmitting ? (
                   <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  t('contacts.formSendRequest')
+                  selectedService ? t('contacts.formSendRequest') : t('contacts.formSend')
                 )}
               </button>
               
               {submitStatus === 'success' && (
-                <div className="p-4 bg-green-50 text-green-700 rounded-xl text-center text-sm">
-                  {t('contacts.formSuccess')}
+                <div className="p-4 bg-emerald-600 text-white rounded-xl text-center text-sm font-medium shadow-sm">
+                  {lastSubmitWasAppointment ? t('contacts.formAppointmentSuccess') : t('contacts.formSuccess')}
                 </div>
               )}
               {submitStatus === 'error' && (
