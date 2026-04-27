@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import type { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../cms/types';
+import type { AppointmentServiceSelection } from '../appointments/serviceRequest';
 
 export type ThemeSectionProps = {
   settings: CmsSettingsResponse['data'];
@@ -8,6 +9,8 @@ export type ThemeSectionProps = {
   galleryItems: CmsItem[];
   domain: string;
   limit?: number;
+  selectedService?: AppointmentServiceSelection | null;
+  onRequestService?: (service: CmsItem) => void;
 };
 
 export type BeautySalonThemeDefinition = {

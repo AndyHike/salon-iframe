@@ -4,7 +4,7 @@ import { useLocale } from '../../../components/LocaleContext';
 import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/types';
 import { resolveLocalizedText } from '../../../cms/normalize/localized';
 import { motion } from 'motion/react';
-import Link from 'next/link';
+import { ServiceRequestAction } from '../../appointments/ServiceRequestAction';
 import { parseThemeData } from '../../theme-data/parser';
 
 export function ServicesSection({ 
@@ -13,7 +13,8 @@ export function ServicesSection({
   servicesItems,
   galleryItems,
   domain,
-  limit
+  limit,
+  onRequestService,
 }: { 
   settings: CmsSettingsResponse['data'];
   appearance: AppearanceContract;
@@ -21,6 +22,7 @@ export function ServicesSection({
   galleryItems: CmsItem[];
   domain: string;
   limit?: number;
+  onRequestService?: (service: CmsItem) => void;
 }) {
   const { locale, t } = useLocale();
   const variant = appearance.sectionVariants.services || 'list';
@@ -151,6 +153,14 @@ export function ServicesSection({
                             {getDescription(service)}
                           </p>
                         )}
+                        <div className="mt-6">
+                          <ServiceRequestAction
+                            service={service}
+                            label={t('services.requestService')}
+                            onRequestService={onRequestService}
+                            className="inline-flex items-center gap-2 border border-stone-300 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-stone-900 transition hover:border-stone-950"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>

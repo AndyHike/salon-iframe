@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { resolveLocalizedText } from '../../../cms/normalize/localized';
 import { useLocale } from '../../../components/LocaleContext';
+import { ServiceRequestAction } from '../../appointments/ServiceRequestAction';
 import type { CmsItem } from '../../../cms/types';
 import type { ThemeSectionProps } from '../types';
 
@@ -15,7 +16,7 @@ function formatPrice(item: CmsItem, fallback: string): string {
   return String(item.price);
 }
 
-export function ServicesSection({ settings, appearance, servicesItems, limit }: ThemeSectionProps) {
+export function ServicesSection({ settings, appearance, servicesItems, limit, onRequestService }: ThemeSectionProps) {
   const { locale, t } = useLocale();
   const defaultLocale = settings.defaultLocale || 'uk';
   const variant = appearance.sectionVariants.services === 'cards' ? 'cards' : 'list';
@@ -75,6 +76,14 @@ export function ServicesSection({ settings, appearance, servicesItems, limit }: 
                   <p className="text-sm font-semibold text-[var(--primary-color)] sm:pt-1">
                     {formatPrice(service, t('services.priceOnRequest'))}
                   </p>
+                  <div className={variant === 'cards' ? 'mt-5 md:col-span-2' : 'sm:col-span-2'}>
+                    <ServiceRequestAction
+                      service={service}
+                      label={t('services.requestService')}
+                      onRequestService={onRequestService}
+                      className="inline-flex items-center gap-2 border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-950 transition hover:border-stone-950"
+                    />
+                  </div>
                 </article>
               );
             })}

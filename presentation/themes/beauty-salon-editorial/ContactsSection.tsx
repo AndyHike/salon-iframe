@@ -6,6 +6,8 @@ import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/t
 import { motion } from 'motion/react';
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Send } from 'lucide-react';
 import { submitContactForm } from '../../../app/actions/contact';
+import { AppointmentFields } from '../../appointments/AppointmentFields';
+import type { AppointmentServiceSelection } from '../../appointments/serviceRequest';
 import { parseThemeData } from '../../theme-data/parser';
 
 export function ContactsSection({ 
@@ -14,7 +16,8 @@ export function ContactsSection({
   servicesItems,
   galleryItems,
   domain,
-  limit
+  limit,
+  selectedService,
 }: { 
   settings: CmsSettingsResponse['data']; 
   appearance: AppearanceContract;
@@ -22,6 +25,7 @@ export function ContactsSection({
   galleryItems: CmsItem[];
   domain: string;
   limit?: number;
+  selectedService?: AppointmentServiceSelection | null;
 }) {
   const { t } = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -164,12 +168,11 @@ export function ContactsSection({
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-xs uppercase tracking-widest text-stone-500 mb-2">{t('contacts.formEmail') || 'EMAIL'}</label>
+                <label htmlFor="email" className="block text-xs uppercase tracking-widest text-stone-500 mb-2">{t('contacts.formEmailOptional')}</label>
                 <input
                   type="email"
                   id="email"
                   name="email"
-                  required
                   className="w-full bg-transparent border-b border-stone-300 py-3 focus:outline-none focus:border-stone-900 transition-colors text-lg"
                   placeholder={t('contacts.formEmailPlaceholder')}
                   autoComplete="email"
@@ -187,13 +190,19 @@ export function ContactsSection({
                   autoComplete="tel"
                 />
               </div>
+              <AppointmentFields
+                key={selectedService?.serviceId ?? 'contact-form-service'}
+                servicesItems={servicesItems}
+                settings={settings}
+                selectedService={selectedService}
+                variant="editorial"
+              />
               <div>
                 <label htmlFor="message" className="block text-xs uppercase tracking-widest text-stone-500 mb-2">{t('contacts.formMessage')}</label>
                 <textarea
                   id="message"
                   name="message"
                   rows={4}
-                  required
                   className="w-full bg-transparent border-b border-stone-300 py-3 focus:outline-none focus:border-stone-900 transition-colors text-lg resize-none"
                   placeholder={t('contacts.formMessagePlaceholder')}
                 ></textarea>
@@ -207,7 +216,7 @@ export function ContactsSection({
                 {isSubmitting ? (
                   <div className="w-5 h-5 border-[3px] border-stone-500 border-t-white rounded-full animate-spin"></div>
                 ) : (
-                  t('contacts.formSend')
+                  t('contacts.formSendRequest')
                 )}
               </button>
               

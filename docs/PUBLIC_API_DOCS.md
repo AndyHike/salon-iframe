@@ -425,17 +425,49 @@ type PublicLocalizedText = Partial<Record<"uk" | "en" | "cs", string>>;
 
 ---
 
-## 4. Надіслати повідомлення зворотного зв'яка ✉️
-Дозволяє відправляти повідомлення з контактних форм вашого сайту (або інших додатків) безпосередньо в розділ "Повідомлення" в адмін-панелі вашого магазину/проекту.
+## 4. Надіслати повідомлення або заявку на запис ✉️
+Дозволяє відправляти з зовнішнього сайту як прості контактні форми, так і структуровані заявки на запис. Обидва типи потрапляють у розділ "Повідомлення" в адмін-панелі.
 
 **URL**: `POST /api/public/v1/messages` (або застарілий `/api/public/messages`)
 
 **Тіло запиту (Request Body - JSON):**
-- `name` (string, **Обов'язково**) - Ім'я відправника
-- `email` (string, **Обов'язково**) - Email для зв'язку (повинен містити `@`)
-- `phone` (string, Необов'язково) - Контактний номер телефону
-- `subject` (string, Необов'язково) - Тема повідомлення
-- `message` (string, **Обов'язково**) - Текст самого повідомлення
+- `requestType` (`general_message | appointment_request`, optional) - Тип звернення. За замовчуванням `general_message`.
+- `name` (string, **required**) - Ім'я клієнта.
+- `email` (string, optional) - Email для зв'язку, якщо переданий має містити `@`.
+- `phone` (string, optional) - Контактний номер телефону.
+- `subject` (string, optional) - Тема звернення.
+- `message` (string, optional) - Додатковий текст клієнта. Це поле **не є required** навіть для звичайного повідомлення.
+- `locale` (string, optional) - Мова форми, наприклад `uk`, `en`, `cs`.
+- `source` (string, optional) - Звідки прийшла форма: `contact_form`, `services_section`, `hero_cta`.
+- `pageUrl` (string, optional) - URL сторінки, з якої відправлено заявку.
+
+Має бути переданий хоча б один контакт: `email` або `phone`.
+
+**Поля послуги для `appointment_request`:**
+- `serviceId` (string, optional) - ID активної послуги з API. Якщо переданий, backend перевіряє, що це активна послуга цього store.
+- `serviceTitle` (string, optional) - Snapshot назви послуги на момент заявки.
+- `servicePrice` (string, optional) - Snapshot ціни, наприклад `від 900 Kč`.
+- `serviceDurationMinutes` (number, optional) - Snapshot тривалості.
+- `categoryId` / `categoryTitle` (string, optional) - Snapshot категорії.
+
+Навіть якщо передається `serviceId`, frontend може дублювати snapshot поля. Адмінка зберігає snapshot у повідомленні, бо назва, ціна або тривалість послуги можуть змінитися пізніше.
+
+**Поведінка `serviceId` і snapshot:**
+- `serviceId` використовується для validation/reference: він має належати поточному store, бути `type = SERVICE` і `isActive = true`.
+- Якщо `serviceId` невалідний, API повертає `400` з `code: "INVALID_SERVICE_ID"` і не створює повідомлення.
+- Snapshot поля (`serviceTitle`, `servicePrice`, `serviceDurationMinutes`, `categoryTitle`) зберігаються у `ContactMessage` як історія заявки.
+- Якщо frontend передав snapshot поле, API зберігає саме передане значення.
+- Якщо snapshot поле не передане, але `serviceId` валідний, API заповнює відсутній snapshot з поточної послуги на момент створення заявки.
+- API не відхиляє заявку лише через те, що переданий snapshot відрізняється від поточних даних послуги. Це дозволяє зберегти те, що клієнт бачив у UI під час відправки.
+- `serviceId` optional: для кастомної або вільної заявки frontend може передати тільки `serviceTitle` / бажаний час без ID.
+
+**Поля бажаного часу для `appointment_request`:**
+- `preferredDate` (string, optional) - `YYYY-MM-DD`.
+- `preferredTime` (string, optional) - `HH:mm`. Якщо переданий, також потрібні `preferredDate` і `timezone`.
+- `timezone` (string, optional) - Наприклад `Europe/Prague`.
+- `preferredTimeLabel` (string, optional) - Вільний label типу `morning`, `afternoon`, `any`.
+
+Для `requestType = appointment_request` потрібно передати хоча б один контекст запису: `serviceId`, `serviceTitle`, `preferredDate` або `preferredTimeLabel`. `message` все одно optional.
 
 **Приклад запиту:**
 ```http
@@ -444,11 +476,32 @@ Content-Type: application/json
 x-public-api-key: <Ваш_API_Key>
 
 {
+  "requestType": "general_message",
   "name": "Іван Іваненко",
   "email": "ivan@example.com",
   "phone": "+380501234567",
   "subject": "Запис на консультацію",
   "message": "Доброго дня, хотів би дізнатися ціни на послуги."
+}
+```
+
+**Приклад заявки на запис:**
+```json
+{
+  "requestType": "appointment_request",
+  "name": "Олена",
+  "phone": "+420777123456",
+  "message": "Можна майстра, який говорить українською?",
+  "serviceId": "service_123",
+  "serviceTitle": "Манікюр",
+  "servicePrice": "від 900 Kč",
+  "serviceDurationMinutes": 60,
+  "preferredDate": "2026-05-12",
+  "preferredTime": "14:30",
+  "timezone": "Europe/Prague",
+  "locale": "uk",
+  "source": "services_section",
+  "pageUrl": "https://example.com/services"
 }
 ```
 
@@ -458,7 +511,9 @@ x-public-api-key: <Ваш_API_Key>
   "success": true,
   "data": {
     "id": "cuid...",
-    "message": "Message successfully received"
+    "requestType": "appointment_request",
+    "status": "NEW",
+    "message": "Request successfully received"
   }
 }
 ```
@@ -484,6 +539,36 @@ x-public-api-key: <Ваш_API_Key>
   "error": "categorySlug is required"
 }
 ```
+
+Для `POST /api/public/v1/messages` validation errors мають стабільний structured формат. Старе поле `error` завжди лишається для сумісності, а нові поля можна використовувати для UI:
+
+```json
+{
+  "success": false,
+  "error": "Either 'email' or 'phone' is required",
+  "code": "MISSING_CONTACT",
+  "fields": ["email", "phone"],
+  "details": {
+    "requiredAny": ["email", "phone"]
+  }
+}
+```
+
+Можливі `code` для `/messages`:
+
+| Code | Field(s) | Meaning |
+| :--- | :--- | :--- |
+| `INVALID_JSON_BODY` | - | Body не є JSON object |
+| `INVALID_REQUEST_TYPE` | `requestType` | Невідомий тип звернення |
+| `VALIDATION_ERROR` | конкретне поле | Неправильний тип або перевищена довжина поля |
+| `INVALID_EMAIL` | `email` | Email переданий, але невалідний |
+| `MISSING_CONTACT` | `email`, `phone` | Потрібен хоча б один контакт |
+| `INVALID_DATE_FORMAT` | `preferredDate` | Очікується `YYYY-MM-DD` |
+| `INVALID_TIME_FORMAT` | `preferredTime` | Очікується `HH:mm` |
+| `MISSING_PREFERRED_TIME_CONTEXT` | `preferredTime`, `preferredDate`, `timezone` | `preferredTime` переданий без дати або timezone |
+| `METADATA_TOO_LARGE` | `metadata` | Serialized metadata перевищує ліміт |
+| `APPOINTMENT_CONTEXT_REQUIRED` | `serviceId`, `serviceTitle`, `preferredDate`, `preferredTimeLabel` | Для `appointment_request` не передано контекст запису |
+| `INVALID_SERVICE_ID` | `serviceId` | ID не належить активній послузі поточного store |
 
 **403 Forbidden** (Сайт існує, але зараз недоступний публічно):
 ```json

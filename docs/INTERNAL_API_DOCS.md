@@ -168,4 +168,53 @@ window.addEventListener('message', (event) => {
 **Category tree context для товарів:**
 `GET /api/public/v1/items?domain=my-store.com&include=categories`
 
+**Надсилання повідомлення або заявки на запис з frontend server route:**
+```http
+POST /api/public/v1/messages?domain=my-store.com
+Authorization: Bearer <SYSTEM_MASTER_KEY>
+Content-Type: application/json
+```
+
+```json
+{
+  "requestType": "appointment_request",
+  "name": "Client name",
+  "phone": "+420777123456",
+  "serviceId": "service_123",
+  "serviceTitle": "Manicure",
+  "servicePrice": "from 900 Kč",
+  "preferredDate": "2026-05-12",
+  "preferredTime": "14:30",
+  "timezone": "Europe/Prague",
+  "source": "services_section"
+}
+```
+
+У цьому режимі `domain` визначає store, а `SYSTEM_MASTER_KEY` лишається тільки на сервері frontend-шаблону. `message` не є обов'язковим; обов'язкові `name` і хоча б один контакт (`email` або `phone`).
+
+Правила `serviceId`/snapshot:
+
+- `serviceId` validation: активний `Item` поточного store з `type = SERVICE`.
+- Якщо `serviceId` не пройшов validation, API повертає `400` з `code: "INVALID_SERVICE_ID"`.
+- Snapshot поля зберігаються в повідомленні як історичний зріз того, що клієнт бачив у UI.
+- Передані frontend snapshot поля мають пріоритет над поточними даними послуги.
+- Якщо snapshot поле не передане, але `serviceId` валідний, API заповнює його з поточної послуги.
+- API не робить mismatch rejection між `serviceId` і snapshot, бо ціна/назва могли змінитися між рендером сторінки і створенням заявки.
+
+Validation errors для `/messages` мають structured `400` формат:
+
+```json
+{
+  "success": false,
+  "error": "'serviceId' must reference an active service in this store",
+  "code": "INVALID_SERVICE_ID",
+  "field": "serviceId",
+  "details": {
+    "requiredType": "SERVICE",
+    "requiredState": "active",
+    "scope": "current_store"
+  }
+}
+```
+
 Це забезпечує повну автономність фронтенд-шаблонів. Ці public endpoints у master-key режимі також повертають той самий `403` availability contract, якщо сайт зараз призупинений або тимчасово вимкнений.

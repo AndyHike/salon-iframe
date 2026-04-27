@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { FontLoader } from './FontLoader';
+import { useLocale } from './LocaleContext';
 import { normalizeAppearance } from '../cms/normalize/appearance';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '../presentation/appearance/applyTokens';
+import { createAppointmentServiceSelection, type AppointmentServiceSelection } from '../presentation/appointments/serviceRequest';
 import { resolveThemeDefinition } from '../presentation/themes/registry';
-import type { BeautySalonPageData } from '../cms/types';
+import type { BeautySalonPageData, CmsItem } from '../cms/types';
 
 export type PageData = BeautySalonPageData;
 
@@ -19,6 +21,8 @@ export function PreviewWrapper({
   initialData: PageData;
 }) {
   const [data, setData] = useState<PageData>(initialData);
+  const [selectedService, setSelectedService] = useState<AppointmentServiceSelection | null>(null);
+  const { locale, t } = useLocale();
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -35,6 +39,47 @@ export function PreviewWrapper({
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, []);
+
+  const focusContactForm = useCallback(() => {
+    window.setTimeout(() => {
+      const contactsSection = document.getElementById('contacts');
+      contactsSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      const serviceSelect = document.querySelector<HTMLElement>('[data-appointment-service-select]');
+      serviceSelect?.focus({ preventScroll: true });
+    }, 60);
+  }, []);
+
+  const handleRequestService = useCallback((service: CmsItem) => {
+    setSelectedService(createAppointmentServiceSelection(
+      service,
+      locale,
+      data.settings.defaultLocale || data.defaultLocale || 'uk',
+      'services_section',
+      t('services.priceOnRequest'),
+    ));
+    focusContactForm();
+  }, [data.defaultLocale, data.settings.defaultLocale, focusContactForm, locale, t]);
+
+  useEffect(() => {
+    const serviceId = new URLSearchParams(window.location.search).get('serviceId');
+    if (!serviceId) return;
+
+    const service = data.servicesItems.find((item) => item.id === serviceId);
+    if (!service) return;
+
+    const timer = window.setTimeout(() => {
+      setSelectedService(createAppointmentServiceSelection(
+        service,
+        locale,
+        data.settings.defaultLocale || data.defaultLocale || 'uk',
+        'services_section',
+        t('services.priceOnRequest'),
+      ));
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [data.defaultLocale, data.servicesItems, data.settings.defaultLocale, locale, t]);
 
   const cssVars = getCssVariablesFromTokens(data.appearance.tokens);
   const fontFamily = getFontFamilyFromTokens(data.appearance.tokens);
@@ -68,6 +113,8 @@ export function PreviewWrapper({
               galleryItems={data.galleryItems}
               domain={domain}
               limit={limit}
+              selectedService={selectedService}
+              onRequestService={handleRequestService}
             />
           );
         })}

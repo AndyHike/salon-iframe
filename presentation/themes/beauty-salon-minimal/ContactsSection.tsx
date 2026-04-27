@@ -5,9 +5,10 @@ import { Clock, Instagram, Mail, MapPin, Phone, Send } from 'lucide-react';
 import { motion } from 'motion/react';
 import { submitContactForm } from '../../../app/actions/contact';
 import { useLocale } from '../../../components/LocaleContext';
+import { AppointmentFields } from '../../appointments/AppointmentFields';
 import type { ThemeSectionProps } from '../types';
 
-export function ContactsSection({ settings, domain }: ThemeSectionProps) {
+export function ContactsSection({ settings, servicesItems, domain, selectedService }: ThemeSectionProps) {
   const { t } = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -165,11 +166,10 @@ export function ContactsSection({ settings, domain }: ThemeSectionProps) {
               />
             </label>
             <label className="grid gap-2 text-sm font-medium text-stone-600">
-              {t('contacts.formEmail')}
+              {t('contacts.formEmailOptional')}
               <input
                 name="email"
                 type="email"
-                required
                 autoComplete="email"
                 className="border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
                 placeholder={t('contacts.formEmailPlaceholder')}
@@ -186,12 +186,18 @@ export function ContactsSection({ settings, domain }: ThemeSectionProps) {
                 placeholder={t('contacts.formPhonePlaceholder')}
               />
             </label>
+            <AppointmentFields
+              key={selectedService?.serviceId ?? 'contact-form-service'}
+              servicesItems={servicesItems}
+              settings={settings}
+              selectedService={selectedService}
+              variant="minimal"
+            />
             <label className="grid gap-2 text-sm font-medium text-stone-600">
               {t('contacts.formMessage')}
               <textarea
                 name="message"
                 rows={5}
-                required
                 className="resize-none border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
                 placeholder={t('contacts.formMessagePlaceholder')}
               />
@@ -203,7 +209,7 @@ export function ContactsSection({ settings, domain }: ThemeSectionProps) {
             className="mt-6 inline-flex w-full items-center justify-center bg-[var(--primary-color)] px-6 py-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             style={{ borderRadius: 'var(--btn-radius)' }}
           >
-            {isSubmitting ? t('contacts.formSending') : t('contacts.formSend')}
+            {isSubmitting ? t('contacts.formSending') : t('contacts.formSendRequest')}
           </button>
           {submitStatus === 'success' && (
             <p className="mt-4 border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
