@@ -165,6 +165,17 @@ export function ContactsSection({ settings, domain }: ThemeSectionProps) {
               />
             </label>
             <label className="grid gap-2 text-sm font-medium text-stone-600">
+              {t('contacts.formEmail')}
+              <input
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                className="border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
+                placeholder={t('contacts.formEmailPlaceholder')}
+              />
+            </label>
+            <label className="grid gap-2 text-sm font-medium text-stone-600">
               {t('contacts.formPhone')}
               <input
                 name="phone"
@@ -180,6 +191,7 @@ export function ContactsSection({ settings, domain }: ThemeSectionProps) {
               <textarea
                 name="message"
                 rows={5}
+                required
                 className="resize-none border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
                 placeholder={t('contacts.formMessagePlaceholder')}
               />

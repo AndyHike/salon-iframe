@@ -193,6 +193,7 @@ export function ContactsSection({
                   id="message"
                   name="message"
                   rows={4}
+                  required
                   className="w-full bg-transparent border-b border-stone-300 py-3 focus:outline-none focus:border-stone-900 transition-colors text-lg resize-none"
                   placeholder={t('contacts.formMessagePlaceholder')}
                 ></textarea>

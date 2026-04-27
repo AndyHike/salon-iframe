@@ -209,6 +209,18 @@ export function ContactsSection({
                 />
               </div>
               <div>
+                <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-1">{t('contacts.formEmail')}</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  autoComplete="email"
+                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent outline-none transition-all bg-white"
+                  placeholder={t('contacts.formEmailPlaceholder')}
+                />
+              </div>
+              <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-stone-700 mb-1">{t('contacts.formPhone')}</label>
                 <input
                   type="tel"
@@ -225,8 +237,9 @@ export function ContactsSection({
                   id="message"
                   name="message"
                   rows={4}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent outline-none transition-all bg-white resize-none"
-                  placeholder={t('contacts.formMessage')}
+                  placeholder={t('contacts.formMessagePlaceholder')}
                 ></textarea>
               </div>
               <button
