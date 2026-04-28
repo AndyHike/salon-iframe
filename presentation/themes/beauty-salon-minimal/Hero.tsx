@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
 import type { ThemeSectionProps } from '../types';
+import { parseMinimalThemeData } from './themeData';
 
 function getFirstGalleryImage(galleryItems: ThemeSectionProps['galleryItems']): string | null {
   for (const item of galleryItems) {
@@ -19,6 +20,7 @@ function getFirstGalleryImage(galleryItems: ThemeSectionProps['galleryItems']): 
 export function Hero({ settings, appearance, galleryItems }: ThemeSectionProps) {
   const { t } = useLocale();
   const tokens = appearance.tokens;
+  const themeData = parseMinimalThemeData(appearance.themeData);
   const companyName = settings.companyName || 'Minimal Beauty Studio';
   const heroImage =
     tokens.heroBackgroundImage ||
@@ -81,14 +83,16 @@ export function Hero({ settings, appearance, galleryItems }: ThemeSectionProps) 
             style={{ backgroundImage: `url(${heroImage})` }}
           />
           <div className="absolute inset-0 bg-stone-950" style={{ opacity: overlayOpacity }} />
-          <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between gap-6 bg-gradient-to-t from-stone-950/70 to-transparent p-6 text-white sm:p-8">
-            <span className="max-w-[12rem] text-sm font-medium leading-6 text-white/90">
-              Calm appointments, clean lines, considered details.
-            </span>
-            <span className="hidden text-xs font-semibold uppercase tracking-[0.28em] text-white/70 sm:block">
-              Studio
-            </span>
-          </div>
+          {themeData.heroChrome === 'caption' && (
+            <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between gap-6 bg-gradient-to-t from-stone-950/70 to-transparent p-6 text-white sm:p-8">
+              <span className="max-w-[12rem] text-sm font-medium leading-6 text-white/90">
+                Calm appointments, clean lines, considered details.
+              </span>
+              <span className="hidden text-xs font-semibold uppercase tracking-[0.28em] text-white/70 sm:block">
+                Studio
+              </span>
+            </div>
+          )}
         </motion.div>
       </div>
     </section>

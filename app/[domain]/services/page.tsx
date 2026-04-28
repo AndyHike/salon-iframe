@@ -5,12 +5,10 @@ import { CmsItemsResponse, CmsItem } from '@/cms/types';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { ClientProviders } from '@/components/ClientProviders';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
 import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 import { FontLoader } from '@/components/FontLoader';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '@/presentation/appearance/applyTokens';
-import { resolveThemeDefinition } from '@/presentation/themes/registry';
+import { resolveThemeAppearance, resolveThemeDefinition } from '@/presentation/themes/registry';
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
   const { domain } = await params;
@@ -79,21 +77,30 @@ export default async function ServicesPage({
   const cssVars = getCssVariablesFromTokens(appearance.tokens);
   const fontFamily = getFontFamilyFromTokens(appearance.tokens);
   const resolvedTheme = resolveThemeDefinition(appearance.themeKey);
+  const themeAppearance = resolveThemeAppearance(appearance, resolvedTheme);
   const ServicesRenderer = resolvedTheme.sections.services;
+  const Navbar = resolvedTheme.shell.Navbar;
+  const Footer = resolvedTheme.shell.Footer;
 
   return (
     <ClientProviders defaultLocale={defaultLocale} availableLocales={availableLocales.map(l => l.code)}>
       <div
-        data-button-style={appearance.tokens.buttonStyle || 'pill'}
+        data-button-style={themeAppearance.tokens.buttonStyle || 'pill'}
         style={cssVars}
         className={`flex flex-col min-h-screen w-full transition-colors duration-300 theme-${resolvedTheme.key}`}
       >
         <FontLoader fontFamily={fontFamily} />
-        <Navbar appearance={appearance} settings={settings} layoutConfig={appearance.layout.blocks} domain={domain} />
+        <Navbar
+          appearance={themeAppearance}
+          settings={settings}
+          layoutConfig={themeAppearance.layout.blocks}
+          domain={domain}
+          navigation={resolvedTheme.navigation}
+        />
         <main className="flex-grow pt-24">
           <ServicesRenderer 
             settings={settings}
-            appearance={appearance}
+            appearance={themeAppearance}
             servicesItems={servicesItems}
             galleryItems={[]}
             domain={domain}
@@ -118,7 +125,7 @@ export default async function ServicesPage({
             </div>
           )}
         </main>
-        <Footer appearance={appearance} settings={settings} />
+        <Footer appearance={themeAppearance} settings={settings} />
       </div>
     </ClientProviders>
   );

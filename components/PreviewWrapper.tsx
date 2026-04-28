@@ -1,14 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Navbar } from './Navbar';
-import { Footer } from './Footer';
 import { FontLoader } from './FontLoader';
 import { useLocale } from './LocaleContext';
 import { normalizeAppearance } from '../cms/normalize/appearance';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '../presentation/appearance/applyTokens';
 import { createAppointmentServiceSelection, type AppointmentServiceSelection } from '../presentation/appointments/serviceRequest';
-import { resolveThemeDefinition } from '../presentation/themes/registry';
+import { resolveThemeAppearance, resolveThemeDefinition } from '../presentation/themes/registry';
 import type { BeautySalonPageData, CmsItem } from '../cms/types';
 
 export type PageData = BeautySalonPageData;
@@ -90,17 +88,26 @@ export function PreviewWrapper({
   
   const themeKey = data.appearance.themeKey || 'beauty-salon-classic';
   const resolvedTheme = resolveThemeDefinition(themeKey);
+  const themeAppearance = resolveThemeAppearance(data.appearance, resolvedTheme);
+  const Navbar = resolvedTheme.shell.Navbar;
+  const Footer = resolvedTheme.shell.Footer;
 
   return (
     <div
-      data-button-style={data.appearance.tokens.buttonStyle || 'pill'}
+      data-button-style={themeAppearance.tokens.buttonStyle || 'pill'}
       style={cssVars}
       className={`flex flex-col min-h-screen w-full transition-colors duration-300 theme-${resolvedTheme.key}`}
     >
       <FontLoader fontFamily={fontFamily} />
-      <Navbar appearance={data.appearance} settings={data.settings} layoutConfig={data.appearance.layout.blocks} domain={domain} />
+      <Navbar
+        appearance={themeAppearance}
+        settings={data.settings}
+        layoutConfig={themeAppearance.layout.blocks}
+        domain={domain}
+        navigation={resolvedTheme.navigation}
+      />
       <main className="flex-grow">
-        {data.appearance.layout.blocks.map((blockName, index) => {
+        {themeAppearance.layout.blocks.map((blockName, index) => {
           const Component = resolvedTheme.sections[blockName];
           if (!Component) return null;
 
@@ -112,7 +119,7 @@ export function PreviewWrapper({
             <Component 
               key={`${blockName}-${index}`} 
               settings={data.settings}
-              appearance={data.appearance}
+              appearance={themeAppearance}
               servicesItems={data.servicesItems}
               galleryItems={data.galleryItems}
               domain={domain}
@@ -124,7 +131,7 @@ export function PreviewWrapper({
           );
         })}
       </main>
-      <Footer appearance={data.appearance} settings={data.settings} />
+      <Footer appearance={themeAppearance} settings={data.settings} />
     </div>
   );
 }

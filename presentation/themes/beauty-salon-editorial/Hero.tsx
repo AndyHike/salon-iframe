@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
 import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/types';
-import { parseThemeData } from '../../theme-data/parser';
+import { parseEditorialThemeData } from './themeData';
 
 export function Hero({ 
   settings, 
@@ -21,7 +21,7 @@ export function Hero({
   limit?: number;
 }) {
   const { t } = useLocale();
-  const themeData = parseThemeData(appearance.themeData);
+  const themeData = parseEditorialThemeData(appearance.themeData);
   const tokens = appearance.tokens;
   const hasBgImage = !!tokens.heroBackgroundImage;
   const companyName = settings.companyName || 'Premium Salon & Barbershop';

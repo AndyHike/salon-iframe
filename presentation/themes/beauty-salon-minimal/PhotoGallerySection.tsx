@@ -5,15 +5,24 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
 import type { ThemeSectionProps } from '../types';
+import { parseMinimalThemeData } from './themeData';
 
 export function PhotoGallerySection({ appearance, galleryItems, limit }: ThemeSectionProps) {
   const { t } = useLocale();
   const variant = appearance.sectionVariants.photoGallery === 'masonry' ? 'masonry' : 'grid';
+  const themeData = parseMinimalThemeData(appearance.themeData);
   const allImages = galleryItems.flatMap((item) => item.images || []);
   const images = limit ? allImages.slice(0, limit) : allImages;
+  const spacingClass =
+    themeData.sectionSpacing === 'compact'
+      ? 'py-16 sm:py-20'
+      : themeData.sectionSpacing === 'airy'
+        ? 'py-28 sm:py-36'
+        : 'py-20 sm:py-28';
+  const imageRatioClass = themeData.galleryImageRatio === 'square' ? 'aspect-square' : 'aspect-[4/5]';
 
   return (
-    <section id="gallery" className="bg-[#f7f7f3] py-20 text-stone-950 sm:py-28">
+    <section id="photoGallery" className={`bg-[#f7f7f3] ${spacingClass} text-stone-950`}>
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -44,7 +53,7 @@ export function PhotoGallerySection({ appearance, galleryItems, limit }: ThemeSe
                 {images.map((image, index) => (
                   <div
                     key={image.id || index}
-                    className="relative aspect-[4/5] overflow-hidden bg-stone-200"
+                    className={`relative ${imageRatioClass} overflow-hidden bg-stone-200`}
                   >
                     <Image
                       src={image.filePath || `https://picsum.photos/seed/minimal-gallery-${index}/800/1000`}
@@ -63,7 +72,16 @@ export function PhotoGallerySection({ appearance, galleryItems, limit }: ThemeSe
                   <div
                     key={image.id || index}
                     className="relative mb-3 break-inside-avoid overflow-hidden bg-stone-200 md:mb-4"
-                    style={{ aspectRatio: index % 3 === 0 ? '4 / 5' : index % 2 === 0 ? '1 / 1' : '5 / 4' }}
+                    style={{
+                      aspectRatio:
+                        themeData.galleryImageRatio === 'square'
+                          ? '1 / 1'
+                          : index % 3 === 0
+                            ? '4 / 5'
+                            : index % 2 === 0
+                              ? '1 / 1'
+                              : '5 / 4',
+                    }}
                   >
                     <Image
                       src={image.filePath || `https://picsum.photos/seed/minimal-gallery-${index}/900/900`}

@@ -5,7 +5,7 @@ import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/t
 import { motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { parseThemeData } from '../../theme-data/parser';
+import { parseEditorialThemeData } from './themeData';
 
 export function PhotoGallerySection({ 
   settings,
@@ -24,7 +24,7 @@ export function PhotoGallerySection({
 }) {
   const { t } = useLocale();
   const variant = appearance.sectionVariants.photoGallery || 'grid';
-  const themeData = parseThemeData(appearance.themeData);
+  const themeData = parseEditorialThemeData(appearance.themeData);
   
   let images = galleryItems.flatMap(item => item.images || []);
   if (limit) images = images.slice(0, limit);
@@ -35,7 +35,7 @@ export function PhotoGallerySection({
   const spacingClass = themeData.sectionSpacing === 'airy' ? 'py-32' : 'py-20';
 
   return (
-    <section id="gallery" className={`${spacingClass} bg-stone-50 border-t border-stone-200`}>
+    <section id="photoGallery" className={`${spacingClass} bg-stone-50 border-t border-stone-200`}>
       <div className="container mx-auto px-4">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}

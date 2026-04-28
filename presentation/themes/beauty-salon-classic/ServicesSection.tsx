@@ -5,7 +5,7 @@ import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/t
 import { resolveLocalizedText } from '../../../cms/normalize/localized';
 import { motion } from 'motion/react';
 import { ServiceRequestAction } from '../../appointments/ServiceRequestAction';
-import { parseThemeData } from '../../theme-data/parser';
+import { parseClassicThemeData } from './themeData';
 
 export function ServicesSection({ 
   settings,
@@ -26,7 +26,7 @@ export function ServicesSection({
 }) {
   const { locale, t } = useLocale();
   const variant = appearance.sectionVariants.services || 'cards';
-  const themeData = parseThemeData(appearance.themeData);
+  const themeData = parseClassicThemeData(appearance.themeData);
   
   let displayItems = servicesItems;
   if (limit) displayItems = displayItems.slice(0, limit);

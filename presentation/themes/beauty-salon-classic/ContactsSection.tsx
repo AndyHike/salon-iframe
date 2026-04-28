@@ -8,7 +8,7 @@ import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Send } from 'lucide-re
 import { submitContactForm } from '../../../app/actions/contact';
 import { AppointmentFields } from '../../appointments/AppointmentFields';
 import type { AppointmentServiceSelection } from '../../appointments/serviceRequest';
-import { parseThemeData } from '../../theme-data/parser';
+import { parseClassicThemeData } from './themeData';
 
 export function ContactsSection({ 
   settings, 
@@ -33,7 +33,7 @@ export function ContactsSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [lastSubmitWasAppointment, setLastSubmitWasAppointment] = useState(false);
-  const themeData = parseThemeData(appearance.themeData);
+  const themeData = parseClassicThemeData(appearance.themeData);
 
   const isPaper = themeData.surfaceStyle === 'paper';
   const surfaceClass = isPaper ? 'shadow-md border-2 border-stone-200 bg-[#fdfbf7]' : 'shadow-sm border border-stone-100 bg-stone-50';

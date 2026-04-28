@@ -7,9 +7,11 @@ import { submitContactForm } from '../../../app/actions/contact';
 import { useLocale } from '../../../components/LocaleContext';
 import { AppointmentFields } from '../../appointments/AppointmentFields';
 import type { ThemeSectionProps } from '../types';
+import { parseMinimalThemeData } from './themeData';
 
 export function ContactsSection({
   settings,
+  appearance,
   servicesItems,
   domain,
   selectedService,
@@ -19,6 +21,13 @@ export function ContactsSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [lastSubmitWasAppointment, setLastSubmitWasAppointment] = useState(false);
+  const themeData = parseMinimalThemeData(appearance.themeData);
+  const spacingClass =
+    themeData.sectionSpacing === 'compact'
+      ? 'py-16 sm:py-20'
+      : themeData.sectionSpacing === 'airy'
+        ? 'py-28 sm:py-36'
+        : 'py-20 sm:py-28';
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -71,7 +80,7 @@ export function ContactsSection({
       : null;
 
   return (
-    <section id="contacts" className="bg-white py-20 text-stone-950 sm:py-28">
+    <section id="contacts" className={`bg-white ${spacingClass} text-stone-950`}>
       <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         <motion.div
           initial={{ opacity: 0, y: 18 }}

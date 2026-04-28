@@ -7,6 +7,7 @@ import { useLocale } from '../../../components/LocaleContext';
 import { ServiceRequestAction } from '../../appointments/ServiceRequestAction';
 import type { CmsItem } from '../../../cms/types';
 import type { ThemeSectionProps } from '../types';
+import { parseMinimalThemeData } from './themeData';
 
 function formatPrice(item: CmsItem, fallback: string): string {
   if (item.price === null || item.price === undefined || item.price === '') {
@@ -20,10 +21,19 @@ export function ServicesSection({ settings, appearance, servicesItems, limit, on
   const { locale, t } = useLocale();
   const defaultLocale = settings.defaultLocale || 'uk';
   const variant = appearance.sectionVariants.services === 'cards' ? 'cards' : 'list';
+  const themeData = parseMinimalThemeData(appearance.themeData);
   const displayItems = limit ? servicesItems.slice(0, limit) : servicesItems;
+  const spacingClass =
+    themeData.sectionSpacing === 'compact'
+      ? 'py-16 sm:py-20'
+      : themeData.sectionSpacing === 'airy'
+        ? 'py-28 sm:py-36'
+        : 'py-20 sm:py-28';
+  const cardPaddingClass = themeData.serviceDensity === 'compact' ? 'p-5 sm:p-6' : 'p-6 sm:p-7';
+  const listPaddingClass = themeData.serviceDensity === 'compact' ? 'py-5' : 'py-7';
 
   return (
-    <section id="services" className="bg-white py-20 text-stone-950 sm:py-28">
+    <section id="services" className={`bg-white ${spacingClass} text-stone-950`}>
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -63,8 +73,8 @@ export function ServicesSection({ settings, appearance, servicesItems, limit, on
                   key={service.id}
                   className={
                     variant === 'cards'
-                      ? 'border border-stone-200 bg-[#fbfaf7] p-6 transition hover:border-stone-400 sm:p-7'
-                      : 'grid gap-4 py-7 transition hover:bg-[#fbfaf7] sm:grid-cols-[1fr_auto] sm:items-start'
+                      ? `border border-stone-200 bg-[#fbfaf7] ${cardPaddingClass} transition hover:border-stone-400`
+                      : `grid gap-4 ${listPaddingClass} transition hover:bg-[#fbfaf7] sm:grid-cols-[1fr_auto] sm:items-start`
                   }
                 >
                   <div>
