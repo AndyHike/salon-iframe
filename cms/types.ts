@@ -14,6 +14,24 @@ export type AppearanceContract = {
   themeData: Record<string, unknown>;
 };
 
+export type LocalizedString = string | Record<string, string>;
+
+export type CmsSeoOverrides = {
+  title?: LocalizedString | null;
+  titleOverride?: LocalizedString | null;
+  description?: LocalizedString | null;
+  descriptionOverride?: LocalizedString | null;
+  h1?: LocalizedString | null;
+  h1Override?: LocalizedString | null;
+  ogTitle?: LocalizedString | null;
+  ogTitleOverride?: LocalizedString | null;
+  ogDescription?: LocalizedString | null;
+  ogDescriptionOverride?: LocalizedString | null;
+  ogImage?: string | null;
+  ogImageOverride?: string | null;
+  noindex?: boolean | null;
+};
+
 export type SiteAvailabilityCode =
   | 'STORE_SUSPENDED'
   | 'SITE_MAINTENANCE'
@@ -43,11 +61,25 @@ export type CmsSettingsResponse = {
     siteId?: string | null;
     storeId?: string | null;
     companyName?: string | null;
+    businessType?: string | null;
+    businessCategory?: string | null;
     phone?: string | null;
     email?: string | null;
     contactName?: string | null;
     address?: string | null;
+    street?: string | null;
+    streetAddress?: string | null;
+    city?: string | null;
+    district?: string | null;
+    postalCode?: string | null;
+    country?: string | null;
     addressUrl?: string | null;
+    bookingUrl?: string | null;
+    googleMapsUrl?: string | null;
+    googleMapsEmbedUrl?: string | null;
+    googleReviewUrl?: string | null;
+    languages?: string[] | string | null;
+    seo?: CmsSeoOverrides | null;
     defaultLocale?: string | null;
     workingHours?: unknown;
     instagramUrl?: string | null;
@@ -82,6 +114,7 @@ export type CmsItem = {
   slug: string;
   description?: Record<string, string> | null;
   content?: Record<string, string> | null;
+  seo?: CmsSeoOverrides | null;
   price?: string | number | null;
   attributes?: Record<string, unknown> | null;
   categories?: CmsItemCategory[];
@@ -128,6 +161,11 @@ export type CmsCategory = {
 export type CmsCategoriesResponse = {
   success: boolean;
   data: CmsCategory[];
+};
+
+export type CmsItemResponse = {
+  success: boolean;
+  data: CmsItem;
 };
 
 export type BeautySalonPageData = {

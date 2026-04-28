@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { CalendarCheck } from 'lucide-react';
 import type { CmsItem } from '../../cms/types';
+import { serviceBookingHref } from '../../lib/routes';
 
 type ServiceRequestActionProps = {
   service: CmsItem;
@@ -41,7 +42,7 @@ export function ServiceRequestAction({
 
   return (
     <Link
-      href={`/?serviceId=${encodeURIComponent(service.id)}#contacts`}
+      href={serviceBookingHref(service.id)}
       className={className}
       data-appointment-service-action
     >

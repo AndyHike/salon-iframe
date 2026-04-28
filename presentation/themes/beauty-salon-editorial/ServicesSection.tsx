@@ -1,10 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { useLocale } from '../../../components/LocaleContext';
 import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/types';
 import { resolveLocalizedText } from '../../../cms/normalize/localized';
 import { motion } from 'motion/react';
 import { ServiceRequestAction } from '../../appointments/ServiceRequestAction';
+import { serviceDetailHref } from '../../../lib/routes';
 import { parseEditorialThemeData } from './themeData';
 
 export function ServicesSection({ 
@@ -141,8 +143,10 @@ export function ServicesSection({
                         `}
                       >
                         <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-3 w-full">
-                          <h4 className="text-2xl font-serif text-stone-900 group-hover/item:text-[var(--primary-color)] transition-colors mb-2 sm:mb-0">
-                            {getTitle(service)}
+                          <h4 className="mb-2 text-2xl font-serif text-stone-900 transition-colors group-hover/item:text-[var(--primary-color)] sm:mb-0">
+                            <Link href={serviceDetailHref(service.slug)} className="hover:text-[var(--primary-color)]">
+                              {getTitle(service)}
+                            </Link>
                           </h4>
                           <span className="text-lg font-medium text-stone-900 tracking-wider">
                             {service.price ? `${service.price} Kč` : t('services.priceOnRequest')}

@@ -1,10 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { useLocale } from '../../../components/LocaleContext';
 import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/types';
 import { resolveLocalizedText } from '../../../cms/normalize/localized';
 import { motion } from 'motion/react';
 import { ServiceRequestAction } from '../../appointments/ServiceRequestAction';
+import { serviceDetailHref } from '../../../lib/routes';
 import { parseClassicThemeData } from './themeData';
 
 export function ServicesSection({ 
@@ -141,8 +143,10 @@ export function ServicesSection({
                         `}
                       >
                         <div className="flex justify-between items-baseline mb-2">
-                          <h4 className="text-lg md:text-xl font-medium text-stone-900 group-hover/item:text-[var(--primary-color)] transition-colors">
-                            {getTitle(service)}
+                          <h4 className="text-lg md:text-xl font-medium text-stone-900 transition-colors group-hover/item:text-[var(--primary-color)]">
+                            <Link href={serviceDetailHref(service.slug)} className="hover:text-[var(--primary-color)]">
+                              {getTitle(service)}
+                            </Link>
                           </h4>
                           <div className="flex-grow border-b-2 border-dotted border-stone-200 mx-4 opacity-40"></div>
                           <span className="text-lg md:text-xl font-semibold text-stone-900 whitespace-nowrap">

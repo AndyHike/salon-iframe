@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { resolveLocalizedText } from '../../../cms/normalize/localized';
 import { useLocale } from '../../../components/LocaleContext';
 import { ServiceRequestAction } from '../../appointments/ServiceRequestAction';
+import { serviceDetailHref } from '../../../lib/routes';
 import type { CmsItem } from '../../../cms/types';
 import type { ThemeSectionProps } from '../types';
 import { parseMinimalThemeData } from './themeData';
@@ -78,7 +79,11 @@ export function ServicesSection({ settings, appearance, servicesItems, limit, on
                   }
                 >
                   <div>
-                    <h3 className="text-xl font-semibold tracking-tight text-stone-950">{title}</h3>
+                    <h3 className="text-xl font-semibold tracking-tight text-stone-950">
+                      <Link href={serviceDetailHref(service.slug)} className="hover:text-[var(--primary-color)]">
+                        {title}
+                      </Link>
+                    </h3>
                     {description && (
                       <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-500">{description}</p>
                     )}
