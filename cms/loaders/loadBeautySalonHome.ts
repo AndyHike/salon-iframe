@@ -1,22 +1,35 @@
 import { loadSiteBootstrap } from './loadSiteBootstrap';
 import { cmsFetchResult } from '../client';
 import { CmsItemsResponse, CmsItem } from '../types';
+import { cacheTags, uniqueCacheTags } from '../../lib/cache-tags';
 
 export async function loadBeautySalonHome(domain: string) {
   const bootstrap = await loadSiteBootstrap(domain);
   if (!bootstrap) return null;
   if (bootstrap.kind === 'blocked') return bootstrap;
 
-  const { settings, appearance } = bootstrap;
+  const { settings, appearance, siteId } = bootstrap;
 
   const [servicesRes, galleryRes] = await Promise.all([
     cmsFetchResult<CmsItemsResponse>('/api/public/v1/items?categorySlug=services&include=categories&limit=100', {
       domain,
-      tags: [domain, `store-${domain}:services`],
+      tags: uniqueCacheTags([
+        cacheTags.domain(domain),
+        cacheTags.site(siteId),
+        cacheTags.collection(siteId, 'services'),
+        cacheTags.view(siteId, 'home'),
+        cacheTags.legacy.collection(domain, 'services'),
+      ]),
     }),
     cmsFetchResult<CmsItemsResponse>('/api/public/v1/items?categorySlug=gallery&limit=100', {
       domain,
-      tags: [domain, `store-${domain}:gallery`],
+      tags: uniqueCacheTags([
+        cacheTags.domain(domain),
+        cacheTags.site(siteId),
+        cacheTags.collection(siteId, 'gallery'),
+        cacheTags.view(siteId, 'home'),
+        cacheTags.legacy.collection(domain, 'gallery'),
+      ]),
     }),
   ]);
 

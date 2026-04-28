@@ -2,6 +2,17 @@ import { headers } from 'next/headers';
 import { parseSiteAvailability } from './availability';
 import type { SiteAvailability } from './types';
 
+const DEFAULT_CMS_REVALIDATE_SECONDS = Number.parseInt(
+  process.env.CMS_CACHE_REVALIDATE_SECONDS || '86400',
+  10,
+);
+
+function resolveDefaultRevalidateSeconds(): number {
+  return Number.isFinite(DEFAULT_CMS_REVALIDATE_SECONDS) && DEFAULT_CMS_REVALIDATE_SECONDS >= 0
+    ? DEFAULT_CMS_REVALIDATE_SECONDS
+    : 86400;
+}
+
 export async function resolveDomainFromHeaders(): Promise<string> {
   const headersList = await headers();
   const forwardedHost = headersList.get('x-forwarded-host');
@@ -21,6 +32,7 @@ export async function cmsFetch<T>(
     body?: any;
     tags?: string[];
     revalidate?: number;
+    cache?: RequestCache;
   }
 ): Promise<T | null> {
   const result = await cmsFetchResult<T>(path, options);
@@ -70,9 +82,10 @@ export async function cmsFetchResult<T>(
     body?: any;
     tags?: string[];
     revalidate?: number;
+    cache?: RequestCache;
   }
 ): Promise<CmsFetchResult<T>> {
-  const { domain, method = 'GET', body, tags, revalidate } = options;
+  const { domain, method = 'GET', body, tags, revalidate, cache } = options;
   const baseUrl = process.env.ADMIN_API_URL || 'http://localhost:3000';
   const masterKey = process.env.SYSTEM_MASTER_KEY;
 
@@ -100,14 +113,25 @@ export async function cmsFetchResult<T>(
     },
   };
 
+  if (cache) {
+    fetchOptions.cache = cache;
+  }
+
   if (body) {
     fetchOptions.body = JSON.stringify(body);
   }
 
-  if (tags || revalidate !== undefined) {
+  const isGetRequest = method.toUpperCase() === 'GET';
+  const effectiveRevalidate = revalidate !== undefined
+    ? revalidate
+    : isGetRequest && tags?.length && cache !== 'no-store'
+      ? resolveDefaultRevalidateSeconds()
+      : undefined;
+
+  if (tags || effectiveRevalidate !== undefined) {
     fetchOptions.next = {};
     if (tags) fetchOptions.next.tags = tags;
-    if (revalidate !== undefined) fetchOptions.next.revalidate = revalidate;
+    if (effectiveRevalidate !== undefined) fetchOptions.next.revalidate = effectiveRevalidate;
   }
 
   try {

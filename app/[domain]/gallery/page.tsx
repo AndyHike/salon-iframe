@@ -7,6 +7,7 @@ import { Metadata } from 'next';
 import { ClientProviders } from '@/components/ClientProviders';
 import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 import { FontLoader } from '@/components/FontLoader';
+import { cacheTags, uniqueCacheTags } from '@/lib/cache-tags';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '@/presentation/appearance/applyTokens';
 import { resolveThemeAppearance, resolveThemeDefinition } from '@/presentation/themes/registry';
 
@@ -55,11 +56,18 @@ export default async function GalleryPage({
     return renderAvailabilityPage({ availability: bootstrap.availability, domain });
   }
 
-  const { settings, appearance } = bootstrap;
+  const { settings, appearance, siteId } = bootstrap;
 
   const galleryRes = await cmsFetchResult<CmsItemsResponse>(`/api/public/v1/items?categorySlug=gallery&limit=${limit}&offset=${offset}`, {
     domain,
-    tags: [domain, `store-${domain}:gallery`],
+    tags: uniqueCacheTags([
+      cacheTags.domain(domain),
+      cacheTags.site(siteId),
+      cacheTags.collection(siteId, 'gallery'),
+      cacheTags.listView(siteId, 'gallery'),
+      cacheTags.view(siteId, 'gallery'),
+      cacheTags.legacy.collection(domain, 'gallery'),
+    ]),
   });
 
   if (!galleryRes.ok && galleryRes.availability) {

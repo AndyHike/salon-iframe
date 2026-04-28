@@ -7,6 +7,7 @@ import { Metadata } from 'next';
 import { ClientProviders } from '@/components/ClientProviders';
 import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 import { FontLoader } from '@/components/FontLoader';
+import { cacheTags, uniqueCacheTags } from '@/lib/cache-tags';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '@/presentation/appearance/applyTokens';
 import { resolveThemeAppearance, resolveThemeDefinition } from '@/presentation/themes/registry';
 
@@ -55,11 +56,17 @@ export default async function ServicesPage({
     return renderAvailabilityPage({ availability: bootstrap.availability, domain });
   }
 
-  const { settings, appearance } = bootstrap;
+  const { settings, appearance, siteId } = bootstrap;
 
   const servicesRes = await cmsFetchResult<CmsItemsResponse>(`/api/public/v1/items?categorySlug=services&include=categories&limit=${limit}&offset=${offset}`, {
     domain,
-    tags: [domain, `store-${domain}:services`],
+    tags: uniqueCacheTags([
+      cacheTags.domain(domain),
+      cacheTags.site(siteId),
+      cacheTags.collection(siteId, 'services'),
+      cacheTags.listView(siteId, 'services'),
+      cacheTags.legacy.collection(domain, 'services'),
+    ]),
   });
 
   if (!servicesRes.ok && servicesRes.availability) {

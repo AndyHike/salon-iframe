@@ -1,11 +1,16 @@
 import { cmsFetchResult } from '../client';
 import { CmsSettingsResponse } from '../types';
 import { normalizeAppearance } from '../normalize/appearance';
+import { cacheTags, resolveSiteCacheId, uniqueCacheTags } from '../../lib/cache-tags';
 
 export async function loadSiteBootstrap(domain: string) {
   const settingsResult = await cmsFetchResult<CmsSettingsResponse>('/api/public/v1/settings', {
     domain,
-    tags: [domain, `store-${domain}:settings`, `store-${domain}:appearance`],
+    tags: uniqueCacheTags([
+      cacheTags.domain(domain),
+      cacheTags.legacy.settings(domain),
+      cacheTags.legacy.appearance(domain),
+    ]),
   });
 
   if (!settingsResult.ok) {
@@ -27,9 +32,11 @@ export async function loadSiteBootstrap(domain: string) {
 
   const { data } = settingsRes;
   const appearance = normalizeAppearance(data.appearance);
+  const siteId = resolveSiteCacheId(data, domain);
 
   return {
     kind: 'available' as const,
+    siteId,
     settings: data,
     appearance,
   };

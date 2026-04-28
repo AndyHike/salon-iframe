@@ -39,6 +39,9 @@ export type SiteAvailability = {
 export type CmsSettingsResponse = {
   success: boolean;
   data: {
+    id?: string | null;
+    siteId?: string | null;
+    storeId?: string | null;
     companyName?: string | null;
     phone?: string | null;
     email?: string | null;
