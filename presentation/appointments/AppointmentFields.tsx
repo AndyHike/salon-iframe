@@ -150,24 +150,6 @@ export function AppointmentFields({
           />
         </div>
       </div>
-
-      <div className={fieldWrapperClass}>
-        <label htmlFor="preferredTimeLabel" className={classes.label}>
-          {t('contacts.formPreferredTimeLabel')}
-        </label>
-        <select
-          id="preferredTimeLabel"
-          name="preferredTimeLabel"
-          className={classes.input}
-          defaultValue=""
-        >
-          <option value="">{t('contacts.formPreferredTimeExact')}</option>
-          <option value="morning">{t('contacts.formPreferredTimeMorning')}</option>
-          <option value="afternoon">{t('contacts.formPreferredTimeAfternoon')}</option>
-          <option value="evening">{t('contacts.formPreferredTimeEvening')}</option>
-          <option value="any">{t('contacts.formPreferredTimeAny')}</option>
-        </select>
-      </div>
     </>
   );
 }

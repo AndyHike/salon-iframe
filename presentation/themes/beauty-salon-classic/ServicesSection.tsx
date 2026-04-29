@@ -7,6 +7,7 @@ import { resolveLocalizedText } from '../../../cms/normalize/localized';
 import { motion } from 'motion/react';
 import { ServiceRequestAction } from '../../appointments/ServiceRequestAction';
 import { serviceDetailHref } from '../../../lib/routes';
+import { formatServicePrice } from '../../../lib/service-data';
 import { parseClassicThemeData } from './themeData';
 
 export function ServicesSection({ 
@@ -150,7 +151,7 @@ export function ServicesSection({
                           </h4>
                           <div className="flex-grow border-b-2 border-dotted border-stone-200 mx-4 opacity-40"></div>
                           <span className="text-lg md:text-xl font-semibold text-stone-900 whitespace-nowrap">
-                            {service.price ? `${service.price} Kč` : t('services.priceOnRequest')}
+                            {formatServicePrice(service, t('services.priceOnRequest'))}
                           </span>
                         </div>
                         {getDescription(service) && (

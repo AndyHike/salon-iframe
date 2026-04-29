@@ -68,6 +68,7 @@ export default async function ServiceDetailRoute({ params }: ServiceRouteProps) 
         />
         <main className="flex-grow">
           <ServiceDetailPage
+            domain={domain}
             settings={data.settings}
             appearance={themeAppearance}
             serviceItem={data.serviceItem}

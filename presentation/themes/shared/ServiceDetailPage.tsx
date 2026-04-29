@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Clock, MapPin, Phone, Tag } from 'lucide-react';
@@ -10,8 +11,10 @@ import { serviceDetailHref } from '@/lib/routes';
 import { formatServicePrice, getServiceDurationMinutes, getServiceImageList } from '@/lib/service-data';
 import { buildServiceH1, getBusinessName, getBusinessType, getLocationLabel } from '@/lib/seo';
 import { ServiceRequestAction } from '@/presentation/appointments/ServiceRequestAction';
+import { AppointmentRequestModal } from '@/presentation/appointments/AppointmentRequestModal';
 
 type ServiceDetailPageProps = {
+  domain: string;
   settings: CmsSettingsResponse['data'];
   appearance: AppearanceContract;
   serviceItem: CmsItem;
@@ -32,9 +35,11 @@ function imageAlt(item: CmsItem, serviceTitle: string, businessName: string, loc
 }
 
 export function ServiceDetailPage({
+  domain,
   settings,
   serviceItem,
 }: ServiceDetailPageProps) {
+  const [isAppointmentOpen, setIsAppointmentOpen] = useState(false);
   const { locale, t } = useLocale();
   const defaultLocale = settings.defaultLocale || 'uk';
   const businessName = getBusinessName(settings);
@@ -100,12 +105,14 @@ export function ServiceDetailPage({
               <ServiceRequestAction
                 service={serviceItem}
                 label={t('services.requestService')}
+                onRequestService={() => setIsAppointmentOpen(true)}
                 className="inline-flex items-center justify-center gap-2 bg-[var(--primary-color)] px-6 py-4 text-sm font-semibold text-white transition hover:opacity-90"
               />
               {settings.phone && (
                 <a
                   href={`tel:${settings.phone}`}
                   className="inline-flex items-center justify-center gap-2 border border-stone-300 bg-white px-6 py-4 text-sm font-semibold text-stone-950 transition hover:border-stone-950"
+                  style={{ borderRadius: 'var(--btn-radius)' }}
                 >
                   <Phone className="h-4 w-4" aria-hidden="true" />
                   {settings.phone}
@@ -185,6 +192,13 @@ export function ServiceDetailPage({
           </div>
         </div>
       </div>
+      <AppointmentRequestModal
+        domain={domain}
+        settings={settings}
+        service={serviceItem}
+        open={isAppointmentOpen}
+        onClose={() => setIsAppointmentOpen(false)}
+      />
     </section>
   );
 }

@@ -5,7 +5,7 @@ import { FontLoader } from './FontLoader';
 import { useLocale } from './LocaleContext';
 import { normalizeAppearance } from '../cms/normalize/appearance';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '../presentation/appearance/applyTokens';
-import { createAppointmentServiceSelection, type AppointmentServiceSelection } from '../presentation/appointments/serviceRequest';
+import { AppointmentRequestModal } from '../presentation/appointments/AppointmentRequestModal';
 import { resolveThemeAppearance, resolveThemeDefinition } from '../presentation/themes/registry';
 import type { BeautySalonPageData, CmsItem } from '../cms/types';
 
@@ -19,8 +19,7 @@ export function PreviewWrapper({
   initialData: PageData;
 }) {
   const [data, setData] = useState<PageData>(initialData);
-  const [selectedService, setSelectedService] = useState<AppointmentServiceSelection | null>(null);
-  const { locale, t } = useLocale();
+  const [appointmentService, setAppointmentService] = useState<CmsItem | null>(null);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -38,29 +37,8 @@ export function PreviewWrapper({
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  const focusContactForm = useCallback(() => {
-    window.setTimeout(() => {
-      const contactsSection = document.getElementById('contacts');
-      contactsSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      const serviceSelect = document.querySelector<HTMLElement>('[data-appointment-service-select]');
-      serviceSelect?.focus({ preventScroll: true });
-    }, 60);
-  }, []);
-
   const handleRequestService = useCallback((service: CmsItem) => {
-    setSelectedService(createAppointmentServiceSelection(
-      service,
-      locale,
-      data.settings.defaultLocale || data.defaultLocale || 'uk',
-      'services_section',
-      t('services.priceOnRequest'),
-    ));
-    focusContactForm();
-  }, [data.defaultLocale, data.settings.defaultLocale, focusContactForm, locale, t]);
-
-  const handleAppointmentRequestComplete = useCallback(() => {
-    setSelectedService(null);
+    setAppointmentService(service);
   }, []);
 
   useEffect(() => {
@@ -71,17 +49,11 @@ export function PreviewWrapper({
     if (!service) return;
 
     const timer = window.setTimeout(() => {
-      setSelectedService(createAppointmentServiceSelection(
-        service,
-        locale,
-        data.settings.defaultLocale || data.defaultLocale || 'uk',
-        'services_section',
-        t('services.priceOnRequest'),
-      ));
+      setAppointmentService(service);
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, [data.defaultLocale, data.servicesItems, data.settings.defaultLocale, locale, t]);
+  }, [data.servicesItems]);
 
   const cssVars = getCssVariablesFromTokens(data.appearance.tokens);
   const fontFamily = getFontFamilyFromTokens(data.appearance.tokens);
@@ -124,14 +96,22 @@ export function PreviewWrapper({
               galleryItems={data.galleryItems}
               domain={domain}
               limit={limit}
-              selectedService={selectedService}
+              selectedService={null}
               onRequestService={handleRequestService}
-              onAppointmentRequestComplete={handleAppointmentRequestComplete}
             />
           );
         })}
       </main>
       <Footer appearance={themeAppearance} settings={data.settings} />
+      {appointmentService && (
+        <AppointmentRequestModal
+          domain={domain}
+          settings={data.settings}
+          service={appointmentService}
+          open={Boolean(appointmentService)}
+          onClose={() => setAppointmentService(null)}
+        />
+      )}
     </div>
   );
 }

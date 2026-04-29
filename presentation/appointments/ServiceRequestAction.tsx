@@ -30,11 +30,12 @@ export function ServiceRequestAction({
   if (onRequestService) {
     return (
       <button
-        type="button"
-        onClick={() => onRequestService(service)}
-        className={className}
-        data-appointment-service-action
-      >
+      type="button"
+      onClick={() => onRequestService(service)}
+      className={className}
+      style={{ borderRadius: 'var(--btn-radius)' }}
+      data-appointment-service-action
+    >
         {content}
       </button>
     );
@@ -44,6 +45,7 @@ export function ServiceRequestAction({
     <Link
       href={serviceBookingHref(service.id)}
       className={className}
+      style={{ borderRadius: 'var(--btn-radius)' }}
       data-appointment-service-action
     >
       {content}

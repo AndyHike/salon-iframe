@@ -29,10 +29,19 @@ export function getServiceImageList(item: CmsItem): NonNullable<CmsItem['images'
   return [...ownImages, ...linkedImages];
 }
 
-export function formatServicePrice(item: CmsItem, fallback: string): string {
+function priceAlreadyHasCurrency(value: string): boolean {
+  return /[a-zA-Z\u00c0-\u024f$€£¥₴₽₹]|Kč|CZK|EUR|USD/i.test(value);
+}
+
+export function formatServicePrice(item: CmsItem, fallback: string, currency = 'Kč'): string {
   if (item.price === null || item.price === undefined || item.price === '') {
     return fallback;
   }
 
-  return String(item.price);
+  if (typeof item.price === 'number') {
+    return `${item.price} ${currency}`;
+  }
+
+  const price = String(item.price).trim();
+  return priceAlreadyHasCurrency(price) ? price : `${price} ${currency}`;
 }
