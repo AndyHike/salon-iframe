@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { submitContactForm } from '../../app/actions/contact';
 import type { CmsItem, CmsSettingsResponse } from '../../cms/types';
@@ -36,6 +36,17 @@ export function AppointmentRequestModal({
     t('services.priceOnRequest'),
   ), [defaultLocale, locale, service, t]);
 
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, open]);
+
   if (!open) return null;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -62,13 +73,16 @@ export function AppointmentRequestModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-stone-950/55 px-4 py-4 backdrop-blur-sm sm:items-center">
+    <div
+      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-stone-950/55 px-4 py-6 backdrop-blur-sm sm:items-center"
+      onMouseDown={onClose}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="appointment-modal-title"
-        className="max-h-[92vh] w-full max-w-2xl overflow-y-auto border border-stone-200 bg-white p-5 shadow-2xl sm:p-8"
-        style={{ borderRadius: 'var(--btn-radius)' }}
+        className="w-full max-w-3xl rounded-lg border border-stone-200 bg-white p-5 shadow-2xl sm:p-8"
+        onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="mb-6 flex items-start justify-between gap-6">
           <div>
@@ -99,16 +113,30 @@ export function AppointmentRequestModal({
             variant="minimal"
           />
 
-          <label className="grid gap-2 text-sm font-medium text-stone-600">
-            {t('contacts.formName')}
-            <input
-              name="name"
-              required
-              autoComplete="name"
-              className="border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
-              placeholder={t('contacts.formNamePlaceholder')}
-            />
-          </label>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="grid gap-2 text-sm font-medium text-stone-600">
+              {t('contacts.formName')}
+              <input
+                name="name"
+                required
+                autoComplete="name"
+                className="border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
+                placeholder={t('contacts.formNamePlaceholder')}
+              />
+            </label>
+
+            <label className="grid gap-2 text-sm font-medium text-stone-600">
+              {t('contacts.formPhone')}
+              <input
+                name="phone"
+                type="tel"
+                required
+                autoComplete="tel"
+                className="border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
+                placeholder={t('contacts.formPhonePlaceholder')}
+              />
+            </label>
+          </div>
 
           <label className="grid gap-2 text-sm font-medium text-stone-600">
             {t('contacts.formEmailOptional')}
@@ -118,18 +146,6 @@ export function AppointmentRequestModal({
               autoComplete="email"
               className="border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
               placeholder={t('contacts.formEmailPlaceholder')}
-            />
-          </label>
-
-          <label className="grid gap-2 text-sm font-medium text-stone-600">
-            {t('contacts.formPhone')}
-            <input
-              name="phone"
-              type="tel"
-              required
-              autoComplete="tel"
-              className="border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
-              placeholder={t('contacts.formPhonePlaceholder')}
             />
           </label>
 
