@@ -11,7 +11,10 @@ import { serviceDetailHref } from '@/lib/routes';
 import { formatServicePrice, getServiceDurationMinutes, getServiceImageList } from '@/lib/service-data';
 import { buildServiceH1, getBusinessName, getBusinessType, getLocationLabel } from '@/lib/seo';
 import { ServiceRequestAction } from '@/presentation/appointments/ServiceRequestAction';
-import { AppointmentRequestModal } from '@/presentation/appointments/AppointmentRequestModal';
+import {
+  AppointmentRequestModal,
+  getAppointmentModalVariant,
+} from '@/presentation/appointments/AppointmentRequestModal';
 
 type ServiceDetailPageProps = {
   domain: string;
@@ -37,6 +40,7 @@ function imageAlt(item: CmsItem, serviceTitle: string, businessName: string, loc
 export function ServiceDetailPage({
   domain,
   settings,
+  appearance,
   serviceItem,
 }: ServiceDetailPageProps) {
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false);
@@ -53,6 +57,7 @@ export function ServiceDetailPage({
   const images = getServiceImageList(serviceItem);
   const primaryImage = images[0];
   const h1 = buildServiceH1(serviceTitle, settings, locale);
+  const appointmentModalVariant = getAppointmentModalVariant(appearance.themeKey);
 
   return (
     <section className="bg-[#f7f7f3] px-5 pb-20 pt-28 text-stone-950 sm:px-8 lg:pb-28">
@@ -198,6 +203,7 @@ export function ServiceDetailPage({
         service={serviceItem}
         open={isAppointmentOpen}
         onClose={() => setIsAppointmentOpen(false)}
+        variant={appointmentModalVariant}
       />
     </section>
   );

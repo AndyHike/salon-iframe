@@ -5,7 +5,10 @@ import { FontLoader } from './FontLoader';
 import { useLocale } from './LocaleContext';
 import { normalizeAppearance } from '../cms/normalize/appearance';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '../presentation/appearance/applyTokens';
-import { AppointmentRequestModal } from '../presentation/appointments/AppointmentRequestModal';
+import {
+  AppointmentRequestModal,
+  getAppointmentModalVariant,
+} from '../presentation/appointments/AppointmentRequestModal';
 import { resolveThemeAppearance, resolveThemeDefinition } from '../presentation/themes/registry';
 import type { BeautySalonPageData, CmsItem } from '../cms/types';
 
@@ -63,6 +66,7 @@ export function PreviewWrapper({
   const themeAppearance = resolveThemeAppearance(data.appearance, resolvedTheme);
   const Navbar = resolvedTheme.shell.Navbar;
   const Footer = resolvedTheme.shell.Footer;
+  const appointmentModalVariant = getAppointmentModalVariant(resolvedTheme.key);
 
   return (
     <div
@@ -110,6 +114,7 @@ export function PreviewWrapper({
           service={appointmentService}
           open={Boolean(appointmentService)}
           onClose={() => setAppointmentService(null)}
+          variant={appointmentModalVariant}
         />
       )}
     </div>
