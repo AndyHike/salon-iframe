@@ -15,7 +15,6 @@ export function ServicesSection({
   appearance, 
   servicesItems,
   galleryItems,
-  domain,
   limit,
   onRequestService,
 }: { 
@@ -101,7 +100,7 @@ export function ServicesSection({
         >
           <h2 className="text-5xl md:text-7xl font-serif text-stone-900 tracking-tighter uppercase">{t('services.title')}</h2>
           <span className="hidden lg:block text-sm font-medium tracking-widest uppercase text-[var(--primary-color)] mt-4 lg:mt-0">
-            {domain}
+            {t('services.kicker')}
           </span>
         </motion.div>
         

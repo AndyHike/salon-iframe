@@ -56,11 +56,11 @@ export function PhotoGallerySection({
         >
           <h2 className="text-5xl md:text-7xl font-serif text-stone-900 tracking-tighter uppercase">{t('gallery.title')}</h2>
           <span className="hidden lg:block text-sm font-medium tracking-widest uppercase text-[var(--primary-color)] mt-4 lg:mt-0">
-             SCENE
+            {t('gallery.kicker')}
           </span>
         </motion.div>
 
-        {filterOptions.length > 1 && (
+        {filterOptions.length > 0 && (
           <div className="mb-14 flex flex-wrap gap-3 border-b border-stone-200 pb-6">
             <button
               type="button"

@@ -7,6 +7,7 @@ import type { ThemeFooterProps } from '../types';
 export function DefaultFooter({ settings }: ThemeFooterProps) {
   const currentYear = new Date().getFullYear();
   const { t } = useLocale();
+  const platformName = process.env.NEXT_PUBLIC_PLATFORM_NAME;
 
   return (
     <footer className="bg-stone-900 text-stone-400 py-12 border-t border-stone-800">
@@ -18,8 +19,10 @@ export function DefaultFooter({ settings }: ThemeFooterProps) {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h3 className="text-white text-xl font-bold mb-4">{settings.companyName || 'Premium Salon'}</h3>
-            <p className="mb-4 max-w-xs">{settings.contactName || 'Experience the finest grooming and beauty services tailored just for you.'}</p>
+            <h3 className="text-white text-xl font-bold mb-4">
+              {settings.companyName || settings.businessType || t('business.defaultName')}
+            </h3>
+            <p className="mb-4 max-w-xs">{settings.contactName || t('business.defaultDescription')}</p>
           </motion.div>
 
           <motion.div
@@ -64,8 +67,12 @@ export function DefaultFooter({ settings }: ThemeFooterProps) {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="pt-8 border-t border-stone-800 text-sm text-center md:text-left flex flex-col md:flex-row justify-between items-center"
         >
-          <p>&copy; {currentYear} {settings.companyName || 'Premium Salon'}. {t('footer.allRightsReserved')}</p>
-          <p className="mt-2 md:mt-0">{t('footer.poweredBy')} <span className="text-white font-semibold">Your Platform</span></p>
+          <p>&copy; {currentYear} {settings.companyName || settings.businessType || t('business.defaultName')}. {t('footer.allRightsReserved')}</p>
+          {platformName && (
+            <p className="mt-2 md:mt-0">
+              {t('footer.poweredBy')} <span className="text-white font-semibold">{platformName}</span>
+            </p>
+          )}
         </motion.div>
       </div>
     </footer>

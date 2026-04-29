@@ -30,11 +30,28 @@ function getPrimaryCategory(item: CmsItem): Record<string, string> | null {
   return category.title as Record<string, string>;
 }
 
-function imageAlt(item: CmsItem, serviceTitle: string, businessName: string, location: string, index: number): string {
+function serviceImageFallback(locale: string, index: number): string {
+  const fallbackByLocale: Record<string, string> = {
+    uk: 'Фото послуги',
+    cs: 'Fotka služby',
+    en: 'Service photo',
+  };
+
+  return `${fallbackByLocale[locale] || fallbackByLocale.en} ${index + 1}`;
+}
+
+function imageAlt(
+  item: CmsItem,
+  serviceTitle: string,
+  businessName: string,
+  location: string,
+  index: number,
+  locale: string,
+): string {
   const image = getServiceImageList(item)[index];
   if (image?.altText) return image.altText;
 
-  return [serviceTitle, businessName, location].filter(Boolean).join(', ') || `Service image ${index + 1}`;
+  return [serviceTitle, businessName, location].filter(Boolean).join(', ') || serviceImageFallback(locale, index);
 }
 
 export function ServiceDetailPage({
@@ -153,7 +170,7 @@ export function ServiceDetailPage({
               <div className="relative aspect-[4/5] overflow-hidden bg-stone-200">
                 <Image
                   src={primaryImage.filePath}
-                  alt={imageAlt(serviceItem, serviceTitle, businessName, location, 0)}
+                  alt={imageAlt(serviceItem, serviceTitle, businessName, location, 0, locale)}
                   fill
                   priority
                   sizes="(min-width: 1024px) 48vw, 100vw"
@@ -184,7 +201,7 @@ export function ServiceDetailPage({
                   >
                     <Image
                       src={image.filePath}
-                      alt={imageAlt(serviceItem, serviceTitle, businessName, location, index + 1)}
+                      alt={imageAlt(serviceItem, serviceTitle, businessName, location, index + 1, locale)}
                       fill
                       sizes="(min-width: 768px) 16vw, 50vw"
                       className="object-cover transition duration-700 hover:scale-105"

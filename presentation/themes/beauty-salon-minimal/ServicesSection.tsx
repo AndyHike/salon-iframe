@@ -47,7 +47,7 @@ export function ServicesSection({ settings, appearance, servicesItems, limit, on
             {t('services.title')}
           </h2>
           <p className="max-w-2xl text-base leading-7 text-stone-500 lg:justify-self-end">
-            A concise service menu with room for signature rituals, quick treatments, and price clarity.
+            {t('services.description')}
           </p>
         </motion.div>
 

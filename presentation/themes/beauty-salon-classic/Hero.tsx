@@ -25,7 +25,7 @@ export function Hero({
   const tokens = appearance.tokens;
   const hasBgImage = !!tokens.heroBackgroundImage;
   const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.4;
-  const companyName = settings.companyName || 'Premium Salon & Barbershop';
+  const companyName = settings.companyName || settings.businessType || t('business.defaultName');
 
   const animationFloat: any = themeData.animationStyle === 'float' ? { y: [0, -10, 0], transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' } } : {};
   const animationInitial = themeData.animationStyle === 'reveal' ? { opacity: 0, scale: 0.95 } : { opacity: 0, y: 30 };
@@ -56,7 +56,7 @@ export function Hero({
           {companyName}
         </motion.h1>
         <p className={`text-xl md:text-2xl mb-10 max-w-2xl mx-auto drop-shadow-sm font-light ${hasBgImage ? 'text-stone-200' : 'text-stone-600'}`}>
-          {t('hero.subtitle') || 'Experience the finest grooming and beauty services tailored just for you.'}
+          {t('hero.subtitle')}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           {themeData.ctaPlacement === 'hero' && (

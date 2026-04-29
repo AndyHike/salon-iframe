@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useLocale } from '@/components/LocaleContext';
 import type { GalleryImageItem } from './galleryData';
 
 type GalleryLightboxVariant = 'classic' | 'editorial' | 'minimal';
@@ -44,6 +45,7 @@ export function GalleryLightbox({
   onChangeIndex,
   variant,
 }: GalleryLightboxProps) {
+  const { t } = useLocale();
   const activeImage = activeIndex === null ? null : images[activeIndex];
   const styles = variantClasses[variant];
   const hasMultipleImages = images.length > 1;
@@ -93,8 +95,10 @@ export function GalleryLightbox({
       <button
         type="button"
         onClick={onClose}
+        onMouseDown={(event) => event.stopPropagation()}
+        onPointerDown={(event) => event.stopPropagation()}
         className={`absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center ${styles.closeButton}`}
-        aria-label="Close"
+        aria-label={t('gallery.close')}
       >
         <X className="h-5 w-5" aria-hidden="true" />
       </button>
@@ -106,8 +110,10 @@ export function GalleryLightbox({
             event.stopPropagation();
             showPrevious();
           }}
-          className={`absolute left-4 top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center sm:flex ${styles.navButton}`}
-          aria-label="Previous image"
+          onMouseDown={(event) => event.stopPropagation()}
+          onPointerDown={(event) => event.stopPropagation()}
+          className={`absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center sm:left-4 sm:h-12 sm:w-12 ${styles.navButton}`}
+          aria-label={t('gallery.previousImage')}
         >
           <ChevronLeft className="h-6 w-6" aria-hidden="true" />
         </button>
@@ -140,8 +146,10 @@ export function GalleryLightbox({
             event.stopPropagation();
             showNext();
           }}
-          className={`absolute right-4 top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center sm:flex ${styles.navButton}`}
-          aria-label="Next image"
+          onMouseDown={(event) => event.stopPropagation()}
+          onPointerDown={(event) => event.stopPropagation()}
+          className={`absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center sm:right-4 sm:h-12 sm:w-12 ${styles.navButton}`}
+          aria-label={t('gallery.nextImage')}
         >
           <ChevronRight className="h-6 w-6" aria-hidden="true" />
         </button>

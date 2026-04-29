@@ -12,7 +12,7 @@ export function Hero({ settings, appearance }: ThemeSectionProps) {
   const { t } = useLocale();
   const tokens = appearance.tokens;
   const themeData = parseMinimalThemeData(appearance.themeData);
-  const companyName = settings.companyName || 'Minimal Beauty Studio';
+  const companyName = settings.companyName || settings.businessType || t('business.defaultName');
   const heroImage =
     tokens.heroBackgroundImage ||
     'https://picsum.photos/seed/beauty-salon-minimal-hero/1200/1500';
@@ -35,13 +35,13 @@ export function Hero({ settings, appearance }: ThemeSectionProps) {
             />
           )}
           <p className="mb-6 text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-            Beauty salon
+            {settings.businessType || t('hero.eyebrow')}
           </p>
           <h1 className="max-w-3xl text-6xl font-semibold leading-[0.9] tracking-tight text-stone-950 sm:text-7xl lg:text-8xl">
             {companyName}
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-stone-600 sm:text-xl">
-            {t('hero.subtitle') || 'Precise care, quiet rituals, and beauty services shaped around you.'}
+            {t('hero.subtitle')}
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
@@ -76,10 +76,10 @@ export function Hero({ settings, appearance }: ThemeSectionProps) {
           {themeData.heroChrome === 'caption' && (
             <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between gap-6 bg-gradient-to-t from-stone-950/70 to-transparent p-6 text-white sm:p-8">
               <span className="max-w-[12rem] text-sm font-medium leading-6 text-white/90">
-                Calm appointments, clean lines, considered details.
+                {t('hero.imageCaption')}
               </span>
               <span className="hidden text-xs font-semibold uppercase tracking-[0.28em] text-white/70 sm:block">
-                Studio
+                {t('hero.imageLabel')}
               </span>
             </div>
           )}

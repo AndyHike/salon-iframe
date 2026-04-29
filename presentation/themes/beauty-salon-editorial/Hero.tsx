@@ -24,7 +24,7 @@ export function Hero({
   const themeData = parseEditorialThemeData(appearance.themeData);
   const tokens = appearance.tokens;
   const hasBgImage = !!tokens.heroBackgroundImage;
-  const companyName = settings.companyName || 'Premium Salon & Barbershop';
+  const companyName = settings.companyName || settings.businessType || t('business.defaultName');
 
   const isSplit = themeData.heroStyle === 'split';
   const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.4;
@@ -51,7 +51,7 @@ export function Hero({
             </h1>
             <div className="w-16 h-1 bg-[var(--primary-color)] mb-8"></div>
             <p className="text-xl md:text-2xl mb-12 max-w-lg text-stone-600 font-light leading-relaxed">
-              {t('hero.subtitle') || 'Experience the finest grooming and beauty services tailored just for you.'}
+              {t('hero.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-6">
               {themeData.ctaPlacement === 'hero' && (
@@ -115,7 +115,7 @@ export function Hero({
           {companyName}
         </h1>
         <p className={`text-xl md:text-2xl mb-12 max-w-2xl mx-auto font-light tracking-wide ${hasBgImage ? 'text-stone-200' : 'text-stone-600'}`}>
-          {t('hero.subtitle') || 'Experience the finest grooming and beauty services tailored just for you.'}
+          {t('hero.subtitle')}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
           {themeData.ctaPlacement === 'hero' && (

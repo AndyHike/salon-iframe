@@ -57,7 +57,7 @@ export function PhotoGallerySection({
           <div className="w-24 h-1 mx-auto rounded bg-[var(--primary-color)]"></div>
         </motion.div>
 
-        {filterOptions.length > 1 && (
+        {filterOptions.length > 0 && (
           <div className="mb-10 flex flex-wrap justify-center gap-3">
             <button
               type="button"

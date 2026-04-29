@@ -54,11 +54,11 @@ export function PhotoGallerySection({ settings, appearance, servicesItems, galle
             {t('gallery.title')}
           </h2>
           <span className="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500">
-            Selected work
+            {t('gallery.kicker')}
           </span>
         </motion.div>
 
-        {filterOptions.length > 1 && (
+        {filterOptions.length > 0 && (
           <div className="mb-10 flex flex-wrap gap-2 border-y border-stone-300 py-4">
             <button
               type="button"
