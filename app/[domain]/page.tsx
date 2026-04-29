@@ -1,9 +1,8 @@
 import { loadBeautySalonHome } from '@/cms/loaders/loadBeautySalonHome';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
-import { ClientProviders } from '@/components/ClientProviders';
-import { PreviewWrapper } from '@/components/PreviewWrapper';
 import { renderAvailabilityPage } from '@/components/AvailabilityPage';
+import { getDefaultLocaleCode, localizedPath } from '@/lib/routes';
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
   const { domain } = await params;
@@ -43,12 +42,6 @@ export default async function DomainPage({ params }: { params: Promise<{ domain:
     return renderAvailabilityPage({ availability: data.availability, domain });
   }
 
-  return (
-    <ClientProviders defaultLocale={data.defaultLocale} availableLocales={data.availableLocales.map(l => l.code)}>
-      <PreviewWrapper 
-        domain={domain}
-        initialData={data} 
-      />
-    </ClientProviders>
-  );
+  const defaultLocale = getDefaultLocaleCode(data.defaultLocale, data.availableLocales);
+  redirect(localizedPath(defaultLocale, '/'));
 }

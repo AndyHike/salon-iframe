@@ -26,7 +26,7 @@ export function ServicesSection({
   limit?: number;
   onRequestService?: (service: CmsItem) => void;
 }) {
-  const { locale, t } = useLocale();
+  const { locale, t, localizedPaths } = useLocale();
   const variant = appearance.sectionVariants.services || 'list';
   const themeData = parseEditorialThemeData(appearance.themeData);
   
@@ -144,7 +144,7 @@ export function ServicesSection({
                       >
                         <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-3 w-full">
                           <h4 className="mb-2 text-2xl font-serif text-stone-900 transition-colors group-hover/item:text-[var(--primary-color)] sm:mb-0">
-                            <Link href={serviceDetailHref(service.slug)} className="hover:text-[var(--primary-color)]">
+                            <Link href={serviceDetailHref(service.slug, localizedPaths ? locale : undefined)} className="hover:text-[var(--primary-color)]">
                               {getTitle(service)}
                             </Link>
                           </h4>

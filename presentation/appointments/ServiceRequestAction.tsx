@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { CalendarCheck } from 'lucide-react';
+import { useLocale } from '../../components/LocaleContext';
 import type { CmsItem } from '../../cms/types';
 import { serviceBookingHref } from '../../lib/routes';
 
@@ -20,6 +21,7 @@ export function ServiceRequestAction({
   className,
   iconClassName = 'h-4 w-4',
 }: ServiceRequestActionProps) {
+  const { locale, localizedPaths } = useLocale();
   const content = (
     <>
       <CalendarCheck className={iconClassName} aria-hidden="true" />
@@ -43,7 +45,7 @@ export function ServiceRequestAction({
 
   return (
     <Link
-      href={serviceBookingHref(service.id)}
+      href={serviceBookingHref(service.id, localizedPaths ? locale : undefined)}
       className={className}
       style={{ borderRadius: 'var(--btn-radius)' }}
       data-appointment-service-action

@@ -19,7 +19,7 @@ function formatPrice(item: CmsItem, fallback: string): string {
 }
 
 export function ServicesSection({ settings, appearance, servicesItems, limit, onRequestService }: ThemeSectionProps) {
-  const { locale, t } = useLocale();
+  const { locale, t, localePath, localizedPaths } = useLocale();
   const defaultLocale = settings.defaultLocale || 'uk';
   const variant = appearance.sectionVariants.services === 'cards' ? 'cards' : 'list';
   const themeData = parseMinimalThemeData(appearance.themeData);
@@ -80,7 +80,7 @@ export function ServicesSection({ settings, appearance, servicesItems, limit, on
                 >
                   <div>
                     <h3 className="text-xl font-semibold tracking-tight text-stone-950">
-                      <Link href={serviceDetailHref(service.slug)} className="hover:text-[var(--primary-color)]">
+                      <Link href={serviceDetailHref(service.slug, localizedPaths ? locale : undefined)} className="hover:text-[var(--primary-color)]">
                         {title}
                       </Link>
                     </h3>
@@ -108,7 +108,7 @@ export function ServicesSection({ settings, appearance, servicesItems, limit, on
         {limit && servicesItems.length > limit && (
           <div className="mt-12">
             <Link
-              href="/services"
+              href={localePath('/services')}
               className="inline-flex border border-stone-300 px-6 py-3 text-sm font-semibold text-stone-950 transition hover:border-stone-950"
               style={{ borderRadius: 'var(--btn-radius)' }}
             >

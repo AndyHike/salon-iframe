@@ -21,7 +21,7 @@ export function PhotoGallerySection({
   galleryItems,
   limit
 }: ThemeSectionProps) {
-  const { locale, t } = useLocale();
+  const { locale, t, localePath } = useLocale();
   const [activeServiceId, setActiveServiceId] = useState('all');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const variant = appearance.sectionVariants.photoGallery || 'masonry';
@@ -180,7 +180,7 @@ export function PhotoGallerySection({
         {limit && galleryImages.length > limit && (
           <div className="mt-16 text-center">
             <Link 
-              href="/gallery" 
+              href={localePath('/gallery')} 
               className="inline-block px-8 py-4 font-medium transition-colors bg-[var(--primary-color)] text-white hover:opacity-90 shadow-md"
               style={{ borderRadius: 'var(--btn-radius)' }}
             >

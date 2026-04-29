@@ -2,6 +2,13 @@ import type { Metadata } from 'next';
 import { resolveLocalizedText } from '@/cms/normalize/localized';
 import type { CmsItem, CmsSeoOverrides, CmsSettingsResponse, LocalizedString } from '@/cms/types';
 import { getServiceDurationMinutes, getServiceImageList } from './service-data';
+import {
+  absoluteSiteUrl,
+  getAvailableLocaleCodes,
+  getDefaultLocaleCode,
+  localizedLanguageAlternates,
+  localizedPath,
+} from './routes';
 
 type Settings = CmsSettingsResponse['data'];
 
@@ -77,9 +84,13 @@ export function buildServiceMetadata(
   service: CmsItem,
   settings: Settings,
   domain: string,
+  requestedLocale?: string,
 ): Metadata {
-  const defaultLocale = settings.defaultLocale || 'uk';
-  const locale = defaultLocale;
+  const availableLocaleCodes = getAvailableLocaleCodes(settings.availableLocales);
+  const defaultLocale = getDefaultLocaleCode(settings.defaultLocale, availableLocaleCodes);
+  const locale = requestedLocale && availableLocaleCodes.includes(requestedLocale)
+    ? requestedLocale
+    : defaultLocale;
   const serviceTitle = resolveLocalizedText(service.title, locale, defaultLocale);
   const serviceDescription = resolveLocalizedText(service.description, locale, defaultLocale);
   const businessName = getBusinessName(settings, domain);
@@ -110,6 +121,14 @@ export function buildServiceMetadata(
   return {
     title,
     description,
+    alternates: {
+      canonical: absoluteSiteUrl(domain, localizedPath(locale, `/services/${encodeURIComponent(service.slug)}`)),
+      languages: localizedLanguageAlternates(
+        domain,
+        availableLocaleCodes,
+        `/services/${encodeURIComponent(service.slug)}`,
+      ),
+    },
     openGraph: {
       title: ogTitle,
       description: ogDescription,

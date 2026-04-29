@@ -61,7 +61,7 @@ export function ServiceDetailPage({
   serviceItem,
 }: ServiceDetailPageProps) {
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false);
-  const { locale, t } = useLocale();
+  const { locale, t, localePath, localizedPaths } = useLocale();
   const defaultLocale = settings.defaultLocale || 'uk';
   const businessName = getBusinessName(settings);
   const businessType = getBusinessType(settings);
@@ -80,7 +80,7 @@ export function ServiceDetailPage({
     <section className="bg-[#f7f7f3] px-5 pb-20 pt-28 text-stone-950 sm:px-8 lg:pb-28">
       <div className="mx-auto max-w-7xl">
         <Link
-          href="/services"
+          href={localePath('/services')}
           className="mb-10 inline-flex items-center gap-2 text-sm font-semibold text-stone-600 transition hover:text-[var(--primary-color)]"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -195,7 +195,7 @@ export function ServiceDetailPage({
                 {images.slice(1, 7).map((image, index) => (
                   <Link
                     key={image.id || image.filePath || index}
-                    href={serviceDetailHref(serviceItem.slug)}
+                    href={serviceDetailHref(serviceItem.slug, localizedPaths ? locale : undefined)}
                     className="relative aspect-square overflow-hidden bg-stone-200"
                     aria-label={serviceTitle}
                   >

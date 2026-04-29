@@ -15,7 +15,7 @@ import {
 import { parseMinimalThemeData } from './themeData';
 
 export function PhotoGallerySection({ settings, appearance, servicesItems, galleryItems, limit }: ThemeSectionProps) {
-  const { locale, t } = useLocale();
+  const { locale, t, localePath } = useLocale();
   const [activeServiceId, setActiveServiceId] = useState('all');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const variant = appearance.sectionVariants.photoGallery === 'masonry' ? 'masonry' : 'grid';
@@ -164,7 +164,7 @@ export function PhotoGallerySection({ settings, appearance, servicesItems, galle
         {limit && galleryImages.length > limit && (
           <div className="mt-12">
             <Link
-              href="/gallery"
+              href={localePath('/gallery')}
               className="inline-flex border border-stone-300 bg-white px-6 py-3 text-sm font-semibold text-stone-950 transition hover:border-stone-950"
               style={{ borderRadius: 'var(--btn-radius)' }}
             >

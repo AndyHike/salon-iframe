@@ -1,12 +1,15 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { getAvailableLocaleCodes, getDefaultLocaleCode, localizedPath } from '../lib/routes';
 
 type LocaleContextType = {
   locale: string;
   setLocale: (locale: string) => void;
   availableLocales: string[];
   t: (key: string) => string;
+  localePath: (href?: string) => string;
+  localizedPaths: boolean;
 };
 
 const translations: Record<string, Record<string, string>> = {
@@ -293,27 +296,42 @@ const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 export function LocaleProvider({ 
   children, 
   defaultLocale, 
-  availableLocales 
+  availableLocales,
+  persistLocale = true,
+  localizedPaths = false,
 }: { 
   children: React.ReactNode; 
   defaultLocale: string; 
   availableLocales: string[];
+  persistLocale?: boolean;
+  localizedPaths?: boolean;
 }) {
-  const [locale, setLocaleState] = useState(defaultLocale);
+  const localeCodes = useMemo(() => getAvailableLocaleCodes(availableLocales), [availableLocales]);
+  const initialLocale = useMemo(
+    () => getDefaultLocaleCode(defaultLocale, localeCodes),
+    [defaultLocale, localeCodes],
+  );
+  const [locale, setLocaleState] = useState(initialLocale);
 
   useEffect(() => {
+    if (!persistLocale) return;
+
     try {
       const savedLocale = localStorage.getItem('locale');
-      if (savedLocale && availableLocales.includes(savedLocale)) {
+      if (savedLocale && localeCodes.includes(savedLocale)) {
         setTimeout(() => setLocaleState(savedLocale), 0);
       }
     } catch (e) {
       console.warn('localStorage is not available:', e);
     }
-  }, [availableLocales]);
+  }, [localeCodes, persistLocale]);
 
   const setLocale = (newLocale: string) => {
+    if (!localeCodes.includes(newLocale)) return;
+
     setLocaleState(newLocale);
+    if (!persistLocale) return;
+
     try {
       localStorage.setItem('locale', newLocale);
     } catch (e) {
@@ -325,8 +343,10 @@ export function LocaleProvider({
     return translations[locale]?.[key] || translations['en']?.[key] || key;
   };
 
+  const localePath = (href: string = '/') => localizedPaths ? localizedPath(locale, href) : href;
+
   return (
-    <LocaleContext.Provider value={{ locale, setLocale, availableLocales, t }}>
+    <LocaleContext.Provider value={{ locale, setLocale, availableLocales: localeCodes, t, localePath, localizedPaths }}>
       {children}
     </LocaleContext.Provider>
   );
