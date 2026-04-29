@@ -21,7 +21,7 @@ export async function loadBeautySalonHome(domain: string) {
         cacheTags.legacy.collection(domain, 'services'),
       ]),
     }),
-    cmsFetchResult<CmsItemsResponse>('/api/public/v1/items?categorySlug=gallery&limit=100', {
+    cmsFetchResult<CmsItemsResponse>('/api/public/v1/items?categorySlug=gallery&include=linkedItems&limit=100', {
       domain,
       tags: uniqueCacheTags([
         cacheTags.domain(domain),

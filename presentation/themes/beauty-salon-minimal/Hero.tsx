@@ -8,23 +8,13 @@ import { useLocale } from '../../../components/LocaleContext';
 import type { ThemeSectionProps } from '../types';
 import { parseMinimalThemeData } from './themeData';
 
-function getFirstGalleryImage(galleryItems: ThemeSectionProps['galleryItems']): string | null {
-  for (const item of galleryItems) {
-    const image = item.images?.[0]?.filePath;
-    if (image) return image;
-  }
-
-  return null;
-}
-
-export function Hero({ settings, appearance, galleryItems }: ThemeSectionProps) {
+export function Hero({ settings, appearance }: ThemeSectionProps) {
   const { t } = useLocale();
   const tokens = appearance.tokens;
   const themeData = parseMinimalThemeData(appearance.themeData);
   const companyName = settings.companyName || 'Minimal Beauty Studio';
   const heroImage =
     tokens.heroBackgroundImage ||
-    getFirstGalleryImage(galleryItems) ||
     'https://picsum.photos/seed/beauty-salon-minimal-hero/1200/1500';
   const overlayOpacity = tokens.heroOverlay ?? 0.16;
 

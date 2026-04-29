@@ -58,23 +58,41 @@ export default async function GalleryPage({
 
   const { settings, appearance, siteId } = bootstrap;
 
-  const galleryRes = await cmsFetchResult<CmsItemsResponse>(`/api/public/v1/items?categorySlug=gallery&limit=${limit}&offset=${offset}`, {
-    domain,
-    tags: uniqueCacheTags([
-      cacheTags.domain(domain),
-      cacheTags.site(siteId),
-      cacheTags.collection(siteId, 'gallery'),
-      cacheTags.listView(siteId, 'gallery'),
-      cacheTags.view(siteId, 'gallery'),
-      cacheTags.legacy.collection(domain, 'gallery'),
-    ]),
-  });
+  const [servicesRes, galleryRes] = await Promise.all([
+    cmsFetchResult<CmsItemsResponse>('/api/public/v1/items?categorySlug=services&include=categories&limit=100', {
+      domain,
+      tags: uniqueCacheTags([
+        cacheTags.domain(domain),
+        cacheTags.site(siteId),
+        cacheTags.collection(siteId, 'services'),
+        cacheTags.view(siteId, 'gallery'),
+        cacheTags.legacy.collection(domain, 'services'),
+      ]),
+    }),
+    cmsFetchResult<CmsItemsResponse>(`/api/public/v1/items?categorySlug=gallery&include=linkedItems&limit=${limit}&offset=${offset}`, {
+      domain,
+      tags: uniqueCacheTags([
+        cacheTags.domain(domain),
+        cacheTags.site(siteId),
+        cacheTags.collection(siteId, 'gallery'),
+        cacheTags.listView(siteId, 'gallery'),
+        cacheTags.view(siteId, 'gallery'),
+        cacheTags.legacy.collection(domain, 'gallery'),
+      ]),
+    }),
+  ]);
+
+  if (!servicesRes.ok && servicesRes.availability) {
+    return renderAvailabilityPage({ availability: servicesRes.availability, domain });
+  }
 
   if (!galleryRes.ok && galleryRes.availability) {
     return renderAvailabilityPage({ availability: galleryRes.availability, domain });
   }
 
+  const servicesData = servicesRes.ok ? servicesRes.data : null;
   const galleryData = galleryRes.ok ? galleryRes.data : null;
+  const servicesItems: CmsItem[] = servicesData?.success && servicesData.data ? servicesData.data : [];
   const galleryItems: CmsItem[] = galleryData?.success && galleryData.data ? galleryData.data : [];
   const totalItems = galleryData?.success && galleryData.meta?.total ? galleryData.meta.total : galleryItems.length;
   const totalPages = Math.ceil(totalItems / limit);
@@ -109,7 +127,7 @@ export default async function GalleryPage({
           <GalleryRenderer 
             settings={settings}
             appearance={themeAppearance}
-            servicesItems={[]}
+            servicesItems={servicesItems}
             galleryItems={galleryItems}
             domain={domain}
           />

@@ -1,18 +1,36 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
 import type { ThemeSectionProps } from '../types';
+import { GalleryLightbox } from '../shared/GalleryLightbox';
+import {
+  buildGalleryImages,
+  buildGalleryServiceFilters,
+  filterGalleryImages,
+} from '../shared/galleryData';
 import { parseMinimalThemeData } from './themeData';
 
-export function PhotoGallerySection({ appearance, galleryItems, limit }: ThemeSectionProps) {
-  const { t } = useLocale();
+export function PhotoGallerySection({ settings, appearance, servicesItems, galleryItems, limit }: ThemeSectionProps) {
+  const { locale, t } = useLocale();
+  const [activeServiceId, setActiveServiceId] = useState('all');
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const variant = appearance.sectionVariants.photoGallery === 'masonry' ? 'masonry' : 'grid';
   const themeData = parseMinimalThemeData(appearance.themeData);
-  const allImages = galleryItems.flatMap((item) => item.images || []);
-  const images = limit ? allImages.slice(0, limit) : allImages;
+  const defaultLocale = settings.defaultLocale || 'uk';
+  const galleryImages = useMemo(
+    () => buildGalleryImages(galleryItems, servicesItems, locale, defaultLocale),
+    [defaultLocale, galleryItems, locale, servicesItems],
+  );
+  const filterOptions = useMemo(
+    () => buildGalleryServiceFilters(galleryImages, servicesItems, locale, defaultLocale),
+    [defaultLocale, galleryImages, locale, servicesItems],
+  );
+  const filteredImages = filterGalleryImages(galleryImages, activeServiceId);
+  const images = limit ? filteredImages.slice(0, limit) : filteredImages;
   const spacingClass =
     themeData.sectionSpacing === 'compact'
       ? 'py-16 sm:py-20'
@@ -20,6 +38,7 @@ export function PhotoGallerySection({ appearance, galleryItems, limit }: ThemeSe
         ? 'py-28 sm:py-36'
         : 'py-20 sm:py-28';
   const imageRatioClass = themeData.galleryImageRatio === 'square' ? 'aspect-square' : 'aspect-[4/5]';
+  const openImageLabel = t('gallery.openImage');
 
   return (
     <section id="photoGallery" className={`bg-[#f7f7f3] ${spacingClass} text-stone-950`}>
@@ -39,6 +58,44 @@ export function PhotoGallerySection({ appearance, galleryItems, limit }: ThemeSe
           </span>
         </motion.div>
 
+        {filterOptions.length > 1 && (
+          <div className="mb-10 flex flex-wrap gap-2 border-y border-stone-300 py-4">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveServiceId('all');
+                setLightboxIndex(null);
+              }}
+              className={`border px-4 py-2 text-sm font-semibold transition ${
+                activeServiceId === 'all'
+                  ? 'border-stone-950 bg-stone-950 text-white'
+                  : 'border-stone-300 bg-white text-stone-600 hover:border-stone-950 hover:text-stone-950'
+              }`}
+              style={{ borderRadius: 'var(--btn-radius)' }}
+            >
+              {t('gallery.filterAll')}
+            </button>
+            {filterOptions.map((service) => (
+              <button
+                key={service.id}
+                type="button"
+                onClick={() => {
+                  setActiveServiceId(service.id);
+                  setLightboxIndex(null);
+                }}
+                className={`border px-4 py-2 text-sm font-semibold transition ${
+                  activeServiceId === service.id
+                    ? 'border-stone-950 bg-stone-950 text-white'
+                    : 'border-stone-300 bg-white text-stone-600 hover:border-stone-950 hover:text-stone-950'
+                }`}
+                style={{ borderRadius: 'var(--btn-radius)' }}
+              >
+                {service.title}
+              </button>
+            ))}
+          </div>
+        )}
+
         {images.length === 0 ? (
           <p className="border-y border-stone-300 py-8 text-stone-500">{t('gallery.empty')}</p>
         ) : (
@@ -51,27 +108,32 @@ export function PhotoGallerySection({ appearance, galleryItems, limit }: ThemeSe
             {variant === 'grid' ? (
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
                 {images.map((image, index) => (
-                  <div
-                    key={image.id || index}
-                    className={`relative ${imageRatioClass} overflow-hidden bg-stone-200`}
+                  <button
+                    key={image.id}
+                    type="button"
+                    onClick={() => setLightboxIndex(index)}
+                    className={`relative block w-full ${imageRatioClass} overflow-hidden bg-stone-200`}
+                    aria-label={`${openImageLabel}: ${image.altText}`}
                   >
                     <Image
-                      src={image.filePath || `https://picsum.photos/seed/minimal-gallery-${index}/800/1000`}
-                      alt={image.altText || `Gallery image ${index + 1}`}
+                      src={image.filePath}
+                      alt={image.altText}
                       fill
                       sizes="(min-width: 768px) 25vw, 50vw"
                       className="object-cover transition duration-700 hover:scale-105"
                       referrerPolicy="no-referrer"
                     />
-                  </div>
+                  </button>
                 ))}
               </div>
             ) : (
               <div className="columns-2 gap-3 md:columns-3 md:gap-4 lg:columns-4">
                 {images.map((image, index) => (
-                  <div
-                    key={image.id || index}
-                    className="relative mb-3 break-inside-avoid overflow-hidden bg-stone-200 md:mb-4"
+                  <button
+                    key={image.id}
+                    type="button"
+                    onClick={() => setLightboxIndex(index)}
+                    className="relative mb-3 block w-full break-inside-avoid overflow-hidden bg-stone-200 md:mb-4"
                     style={{
                       aspectRatio:
                         themeData.galleryImageRatio === 'square'
@@ -82,23 +144,24 @@ export function PhotoGallerySection({ appearance, galleryItems, limit }: ThemeSe
                               ? '1 / 1'
                               : '5 / 4',
                     }}
+                    aria-label={`${openImageLabel}: ${image.altText}`}
                   >
                     <Image
-                      src={image.filePath || `https://picsum.photos/seed/minimal-gallery-${index}/900/900`}
-                      alt={image.altText || `Gallery image ${index + 1}`}
+                      src={image.filePath}
+                      alt={image.altText}
                       fill
                       sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
                       className="object-cover transition duration-700 hover:scale-105"
                       referrerPolicy="no-referrer"
                     />
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
           </motion.div>
         )}
 
-        {limit && allImages.length > limit && (
+        {limit && galleryImages.length > limit && (
           <div className="mt-12">
             <Link
               href="/gallery"
@@ -110,6 +173,13 @@ export function PhotoGallerySection({ appearance, galleryItems, limit }: ThemeSe
           </div>
         )}
       </div>
+      <GalleryLightbox
+        images={images}
+        activeIndex={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onChangeIndex={setLightboxIndex}
+        variant="minimal"
+      />
     </section>
   );
 }

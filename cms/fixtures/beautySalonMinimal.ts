@@ -79,9 +79,21 @@ export const beautySalonMinimalFixture: BeautySalonPageData = {
   ],
   galleryItems: [
     {
-      id: 'gallery-studio',
-      title: { en: 'Studio details' },
-      slug: 'studio-details',
+      id: 'gallery-cut',
+      title: { en: 'Signature cut work' },
+      slug: 'signature-cut-work',
+      linkedItems: [
+        {
+          id: 'gallery-cut-service-link',
+          type: 'service',
+          targetItem: {
+            id: 'service-cut',
+            title: { en: 'Signature cut' },
+            slug: 'signature-cut',
+            price: '$70',
+          },
+        },
+      ],
       images: [
         {
           id: 'gallery-1',
@@ -89,20 +101,58 @@ export const beautySalonMinimalFixture: BeautySalonPageData = {
           altText: 'Minimal salon chair and mirror',
         },
         {
-          id: 'gallery-2',
-          filePath: 'https://picsum.photos/seed/minimal-salon-2/900/900',
-          altText: 'Beauty products arranged on a shelf',
-        },
-        {
           id: 'gallery-3',
           filePath: 'https://picsum.photos/seed/minimal-salon-3/900/1000',
           altText: 'Hair styling station',
+        },
+      ],
+    },
+    {
+      id: 'gallery-color',
+      title: { en: 'Color refresh work' },
+      slug: 'color-refresh-work',
+      linkedItems: [
+        {
+          id: 'gallery-color-service-link',
+          type: 'service',
+          targetItem: {
+            id: 'service-color',
+            title: { en: 'Soft color refresh' },
+            slug: 'soft-color-refresh',
+            price: '$120',
+          },
+        },
+      ],
+      images: [
+        {
+          id: 'gallery-2',
+          filePath: 'https://picsum.photos/seed/minimal-salon-2/900/900',
+          altText: 'Beauty products arranged on a shelf',
         },
         {
           id: 'gallery-4',
           filePath: 'https://picsum.photos/seed/minimal-salon-4/900/700',
           altText: 'Soft salon interior detail',
         },
+      ],
+    },
+    {
+      id: 'gallery-facial',
+      title: { en: 'Hydration facial work' },
+      slug: 'hydration-facial-work',
+      linkedItems: [
+        {
+          id: 'gallery-facial-service-link',
+          type: 'service',
+          targetItem: {
+            id: 'service-facial',
+            title: { en: 'Hydration facial' },
+            slug: 'hydration-facial',
+            price: '$95',
+          },
+        },
+      ],
+      images: [
         {
           id: 'gallery-5',
           filePath: 'https://picsum.photos/seed/minimal-salon-5/900/1200',
