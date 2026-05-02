@@ -13,15 +13,31 @@ function resolveDefaultRevalidateSeconds(): number {
     : 86400;
 }
 
-export async function resolveDomainFromHeaders(): Promise<string> {
+function readFirstHeaderValue(value: string | null): string | null {
+  return value?.split(',')[0]?.trim() || null;
+}
+
+function stripHostPort(host: string): string {
+  if (host.startsWith('[')) {
+    return host.slice(1).split(']')[0] || host;
+  }
+
+  return host.split(':')[0] || host;
+}
+
+export async function resolveHostFromHeaders(): Promise<string> {
   const headersList = await headers();
-  const forwardedHost = headersList.get('x-forwarded-host');
+  const forwardedHost = readFirstHeaderValue(headersList.get('x-forwarded-host'));
   if (forwardedHost) return forwardedHost;
   
-  const host = headersList.get('host');
+  const host = readFirstHeaderValue(headersList.get('host'));
   if (host) return host;
   
   return 'localhost';
+}
+
+export async function resolveDomainFromHeaders(): Promise<string> {
+  return stripHostPort(await resolveHostFromHeaders());
 }
 
 export async function cmsFetch<T>(
