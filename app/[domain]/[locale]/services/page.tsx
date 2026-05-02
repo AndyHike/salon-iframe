@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ClientProviders } from '@/components/ClientProviders';
 import { FontLoader } from '@/components/FontLoader';
+import { JsonLd } from '@/components/JsonLd';
 import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 import { cmsFetchResult } from '@/cms/client';
 import { loadSiteBootstrap } from '@/cms/loaders/loadSiteBootstrap';
@@ -10,14 +11,8 @@ import type { CmsItem, CmsItemsResponse } from '@/cms/types';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '@/presentation/appearance/applyTokens';
 import { resolveThemeAppearance, resolveThemeDefinition } from '@/presentation/themes/registry';
 import { cacheTags, uniqueCacheTags } from '@/lib/cache-tags';
-import {
-  absoluteSiteUrl,
-  getAvailableLocaleCodes,
-  getDefaultLocaleCode,
-  isSupportedLocale,
-  localizedLanguageAlternates,
-  localizedPath,
-} from '@/lib/routes';
+import { localizedPath } from '@/lib/routes';
+import { buildServicesJsonLd, buildServicesMetadata } from '@/lib/seo';
 import { resolveSiteLocale } from '../../_site/locale';
 
 type LocalizedServicesRouteProps = {
@@ -41,20 +36,7 @@ export async function generateMetadata({ params }: LocalizedServicesRouteProps):
     };
   }
 
-  const availableLocaleCodes = getAvailableLocaleCodes(bootstrap.settings.availableLocales);
-  const defaultLocale = getDefaultLocaleCode(bootstrap.settings.defaultLocale, availableLocaleCodes);
-  const metadataLocale = isSupportedLocale(locale) && availableLocaleCodes.includes(locale)
-    ? locale
-    : defaultLocale;
-
-  return {
-    title: `Services | ${bootstrap.settings.companyName || domain}`,
-    description: `Our services at ${bootstrap.settings.companyName || domain}`,
-    alternates: {
-      canonical: absoluteSiteUrl(domain, localizedPath(metadataLocale, '/services')),
-      languages: localizedLanguageAlternates(domain, availableLocaleCodes, '/services'),
-    },
-  };
+  return buildServicesMetadata(bootstrap.settings, [], domain, locale);
 }
 
 export default async function LocalizedServicesPage({
@@ -110,12 +92,14 @@ export default async function LocalizedServicesPage({
   const Footer = resolvedTheme.shell.Footer;
 
   return (
-    <ClientProviders
-      defaultLocale={siteLocale.locale}
-      availableLocales={siteLocale.availableLocaleCodes}
-      persistLocale={false}
-      localizedPaths
-    >
+    <>
+      <JsonLd id="services-json-ld" data={buildServicesJsonLd(settings, servicesItems, domain, siteLocale.locale)} />
+      <ClientProviders
+        defaultLocale={siteLocale.locale}
+        availableLocales={siteLocale.availableLocaleCodes}
+        persistLocale={false}
+        localizedPaths
+      >
       <div
         data-button-style={themeAppearance.tokens.buttonStyle || 'pill'}
         style={cssVars}
@@ -158,6 +142,7 @@ export default async function LocalizedServicesPage({
         </main>
         <Footer appearance={themeAppearance} settings={settings} />
       </div>
-    </ClientProviders>
+      </ClientProviders>
+    </>
   );
 }

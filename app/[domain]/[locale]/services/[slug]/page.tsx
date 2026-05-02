@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ClientProviders } from '@/components/ClientProviders';
 import { FontLoader } from '@/components/FontLoader';
+import { JsonLd } from '@/components/JsonLd';
 import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 import { loadBeautySalonServiceDetail } from '@/cms/loaders/loadBeautySalonServiceDetail';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '@/presentation/appearance/applyTokens';
 import { resolveThemeAppearance, resolveThemeDefinition } from '@/presentation/themes/registry';
 import { ServiceDetailPage } from '@/presentation/themes/shared/ServiceDetailPage';
-import { buildServiceMetadata } from '@/lib/seo';
+import { buildServiceJsonLd, buildServiceMetadata } from '@/lib/seo';
 import { getAvailableLocaleCodes, getDefaultLocaleCode, isSupportedLocale } from '@/lib/routes';
 import { resolveSiteLocale } from '../../../_site/locale';
 
@@ -61,12 +62,14 @@ export default async function LocalizedServiceDetailRoute({ params }: LocalizedS
   const Footer = resolvedTheme.shell.Footer;
 
   return (
-    <ClientProviders
-      defaultLocale={siteLocale.locale}
-      availableLocales={siteLocale.availableLocaleCodes}
-      persistLocale={false}
-      localizedPaths
-    >
+    <>
+      <JsonLd id="service-json-ld" data={buildServiceJsonLd(data.serviceItem, data.settings, domain, siteLocale.locale)} />
+      <ClientProviders
+        defaultLocale={siteLocale.locale}
+        availableLocales={siteLocale.availableLocaleCodes}
+        persistLocale={false}
+        localizedPaths
+      >
       <div
         data-button-style={themeAppearance.tokens.buttonStyle || 'pill'}
         style={cssVars}
@@ -90,6 +93,7 @@ export default async function LocalizedServiceDetailRoute({ params }: LocalizedS
         </main>
         <Footer appearance={themeAppearance} settings={data.settings} />
       </div>
-    </ClientProviders>
+      </ClientProviders>
+    </>
   );
 }

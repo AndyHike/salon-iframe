@@ -5,14 +5,16 @@
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
+import { buildHomeH1 } from '../../../lib/seo';
 import type { ThemeSectionProps } from '../types';
 import { parseMinimalThemeData } from './themeData';
 
-export function Hero({ settings, appearance }: ThemeSectionProps) {
-  const { t } = useLocale();
+export function Hero({ settings, appearance, servicesItems }: ThemeSectionProps) {
+  const { locale, t } = useLocale();
   const tokens = appearance.tokens;
   const themeData = parseMinimalThemeData(appearance.themeData);
   const companyName = settings.companyName || settings.businessType || t('business.defaultName');
+  const heroTitle = buildHomeH1(settings, servicesItems, locale);
   const heroImage =
     tokens.heroBackgroundImage ||
     'https://picsum.photos/seed/beauty-salon-minimal-hero/1200/1500';
@@ -38,7 +40,7 @@ export function Hero({ settings, appearance }: ThemeSectionProps) {
             {settings.businessType || t('hero.eyebrow')}
           </p>
           <h1 className="max-w-3xl text-6xl font-semibold leading-[0.9] tracking-tight text-stone-950 sm:text-7xl lg:text-8xl">
-            {companyName}
+            {heroTitle}
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-stone-600 sm:text-xl">
             {t('hero.subtitle')}

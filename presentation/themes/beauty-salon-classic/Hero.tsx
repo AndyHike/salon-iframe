@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
 import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/types';
+import { buildHomeH1 } from '../../../lib/seo';
 import { parseClassicThemeData } from './themeData';
 
 export function Hero({ 
@@ -20,12 +21,12 @@ export function Hero({
   domain: string;
   limit?: number;
 }) {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const themeData = parseClassicThemeData(appearance.themeData);
   const tokens = appearance.tokens;
   const hasBgImage = !!tokens.heroBackgroundImage;
   const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.4;
-  const companyName = settings.companyName || settings.businessType || t('business.defaultName');
+  const heroTitle = buildHomeH1(settings, servicesItems, locale);
 
   const animationFloat: any = themeData.animationStyle === 'float' ? { y: [0, -10, 0], transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' } } : {};
   const animationInitial = themeData.animationStyle === 'reveal' ? { opacity: 0, scale: 0.95 } : { opacity: 0, y: 30 };
@@ -53,7 +54,7 @@ export function Hero({
           animate={animationFloat}
           className="text-5xl md:text-7xl lg:text-8xl font-serif tracking-tight mb-6 drop-shadow-sm"
         >
-          {companyName}
+          {heroTitle}
         </motion.h1>
         <p className={`text-xl md:text-2xl mb-10 max-w-2xl mx-auto drop-shadow-sm font-light ${hasBgImage ? 'text-stone-200' : 'text-stone-600'}`}>
           {t('hero.subtitle')}

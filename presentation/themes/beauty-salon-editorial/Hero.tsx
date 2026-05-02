@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
 import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/types';
+import { buildHomeH1 } from '../../../lib/seo';
 import { parseEditorialThemeData } from './themeData';
 
 export function Hero({ 
@@ -20,11 +21,11 @@ export function Hero({
   domain: string;
   limit?: number;
 }) {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const themeData = parseEditorialThemeData(appearance.themeData);
   const tokens = appearance.tokens;
   const hasBgImage = !!tokens.heroBackgroundImage;
-  const companyName = settings.companyName || settings.businessType || t('business.defaultName');
+  const heroTitle = buildHomeH1(settings, servicesItems, locale);
 
   const isSplit = themeData.heroStyle === 'split';
   const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.4;
@@ -47,7 +48,7 @@ export function Hero({
             className="w-full lg:w-1/2 flex flex-col justify-center items-start px-6 lg:px-16 py-20 z-10"
           >
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif tracking-tighter mb-8 text-stone-900 leading-[0.9]">
-              {companyName}
+              {heroTitle}
             </h1>
             <div className="w-16 h-1 bg-[var(--primary-color)] mb-8"></div>
             <p className="text-xl md:text-2xl mb-12 max-w-lg text-stone-600 font-light leading-relaxed">
@@ -112,7 +113,7 @@ export function Hero({
         className={`container mx-auto px-4 relative z-10 text-center flex flex-col items-center ${hasBgImage ? 'text-white' : 'text-stone-900'}`}
       >
         <h1 className="text-6xl md:text-8xl lg:text-9xl font-serif tracking-tighter mb-8 drop-shadow-sm uppercase">
-          {companyName}
+          {heroTitle}
         </h1>
         <p className={`text-xl md:text-2xl mb-12 max-w-2xl mx-auto font-light tracking-wide ${hasBgImage ? 'text-stone-200' : 'text-stone-600'}`}>
           {t('hero.subtitle')}

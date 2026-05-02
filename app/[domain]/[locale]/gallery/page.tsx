@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ClientProviders } from '@/components/ClientProviders';
 import { FontLoader } from '@/components/FontLoader';
+import { JsonLd } from '@/components/JsonLd';
 import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 import { cmsFetchResult } from '@/cms/client';
 import { loadSiteBootstrap } from '@/cms/loaders/loadSiteBootstrap';
@@ -10,14 +11,8 @@ import type { CmsItem, CmsItemsResponse } from '@/cms/types';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '@/presentation/appearance/applyTokens';
 import { resolveThemeAppearance, resolveThemeDefinition } from '@/presentation/themes/registry';
 import { cacheTags, uniqueCacheTags } from '@/lib/cache-tags';
-import {
-  absoluteSiteUrl,
-  getAvailableLocaleCodes,
-  getDefaultLocaleCode,
-  isSupportedLocale,
-  localizedLanguageAlternates,
-  localizedPath,
-} from '@/lib/routes';
+import { localizedPath } from '@/lib/routes';
+import { buildGalleryJsonLd, buildGalleryMetadata } from '@/lib/seo';
 import { resolveSiteLocale } from '../../_site/locale';
 
 type LocalizedGalleryRouteProps = {
@@ -41,20 +36,7 @@ export async function generateMetadata({ params }: LocalizedGalleryRouteProps): 
     };
   }
 
-  const availableLocaleCodes = getAvailableLocaleCodes(bootstrap.settings.availableLocales);
-  const defaultLocale = getDefaultLocaleCode(bootstrap.settings.defaultLocale, availableLocaleCodes);
-  const metadataLocale = isSupportedLocale(locale) && availableLocaleCodes.includes(locale)
-    ? locale
-    : defaultLocale;
-
-  return {
-    title: `Gallery | ${bootstrap.settings.companyName || domain}`,
-    description: `Our gallery at ${bootstrap.settings.companyName || domain}`,
-    alternates: {
-      canonical: absoluteSiteUrl(domain, localizedPath(metadataLocale, '/gallery')),
-      languages: localizedLanguageAlternates(domain, availableLocaleCodes, '/gallery'),
-    },
-  };
+  return buildGalleryMetadata(bootstrap.settings, domain, locale);
 }
 
 export default async function LocalizedGalleryPage({
@@ -129,12 +111,14 @@ export default async function LocalizedGalleryPage({
   const Footer = resolvedTheme.shell.Footer;
 
   return (
-    <ClientProviders
-      defaultLocale={siteLocale.locale}
-      availableLocales={siteLocale.availableLocaleCodes}
-      persistLocale={false}
-      localizedPaths
-    >
+    <>
+      <JsonLd id="gallery-json-ld" data={buildGalleryJsonLd(settings, galleryItems, domain, siteLocale.locale)} />
+      <ClientProviders
+        defaultLocale={siteLocale.locale}
+        availableLocales={siteLocale.availableLocaleCodes}
+        persistLocale={false}
+        localizedPaths
+      >
       <div
         data-button-style={themeAppearance.tokens.buttonStyle || 'pill'}
         style={cssVars}
@@ -177,6 +161,7 @@ export default async function LocalizedGalleryPage({
         </main>
         <Footer appearance={themeAppearance} settings={settings} />
       </div>
-    </ClientProviders>
+      </ClientProviders>
+    </>
   );
 }

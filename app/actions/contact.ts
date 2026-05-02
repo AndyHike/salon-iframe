@@ -23,6 +23,14 @@ function readCmsError(body: unknown) {
   return typeof error === 'string' ? error : null;
 }
 
+function hasExplicitFailure(body: unknown): boolean {
+  return Boolean(
+    body &&
+    typeof body === 'object' &&
+    (body as Record<string, unknown>).success === false
+  );
+}
+
 function readFormNumber(formData: FormData, key: string) {
   const value = readFormString(formData, key);
   if (!value) return undefined;
@@ -79,7 +87,7 @@ export async function submitContactForm(domain: string, formData: FormData) {
     return { success: false, error: 'Appointment context is required' };
   }
 
-  const result = await cmsFetchResult<{ success: boolean }>('/api/public/v1/messages', {
+  const result = await cmsFetchResult<unknown>('/api/public/v1/messages', {
     domain,
     method: 'POST',
     body: {
@@ -104,7 +112,7 @@ export async function submitContactForm(domain: string, formData: FormData) {
     },
   });
 
-  if (result.ok && result.data.success) {
+  if (result.ok && !hasExplicitFailure(result.data)) {
     return { success: true };
   }
 
