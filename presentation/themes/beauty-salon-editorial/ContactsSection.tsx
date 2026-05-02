@@ -42,15 +42,16 @@ export function ContactsSection({
     setIsSubmitting(true);
     setSubmitStatus('idle');
     const wasAppointmentRequest = Boolean(selectedService);
+    const form = e.currentTarget;
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     
     try {
       const result = await submitContactForm(domain, formData);
       if (result.success) {
         setLastSubmitWasAppointment(wasAppointmentRequest);
         setSubmitStatus('success');
-        (e.target as HTMLFormElement).reset();
+        form.reset();
         onAppointmentRequestComplete?.();
       } else {
         setSubmitStatus('error');

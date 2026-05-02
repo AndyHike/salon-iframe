@@ -137,15 +137,16 @@ export function AppointmentRequestModal({
     event.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
+    const form = event.currentTarget;
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     formData.set('requestType', 'appointment_request');
 
     try {
       const result = await submitContactForm(domain, formData);
       if (result.success) {
         setSubmitStatus('success');
-        event.currentTarget.reset();
+        form.reset();
       } else {
         setSubmitStatus('error');
       }
