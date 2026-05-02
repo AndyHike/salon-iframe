@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
 import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/types';
-import { buildHomeH1 } from '../../../lib/seo';
+import { buildHomeHeroTitle } from '../../../lib/seo';
 import { parseClassicThemeData } from './themeData';
 
 export function Hero({ 
@@ -26,7 +26,7 @@ export function Hero({
   const tokens = appearance.tokens;
   const hasBgImage = !!tokens.heroBackgroundImage;
   const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.4;
-  const heroTitle = buildHomeH1(settings, servicesItems, locale);
+  const heroTitle = buildHomeHeroTitle(settings, servicesItems, locale);
 
   const animationFloat: any = themeData.animationStyle === 'float' ? { y: [0, -10, 0], transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' } } : {};
   const animationInitial = themeData.animationStyle === 'reveal' ? { opacity: 0, scale: 0.95 } : { opacity: 0, y: 30 };

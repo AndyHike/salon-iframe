@@ -301,6 +301,16 @@ export function buildHomeH1(settings: Settings, services: CmsItem[], locale: str
   return seoH1 || withLocation(subject, getLocationLabel(settings), resolvedLocale);
 }
 
+export function buildHomeHeroTitle(settings: Settings, services: CmsItem[], locale: string): string {
+  const availableLocales = getAvailableLocaleCodes(settings.availableLocales);
+  const defaultLocale = getDefaultLocaleCode(settings.defaultLocale, availableLocales);
+  const resolvedLocale = availableLocales.includes(locale) ? locale : defaultLocale;
+  const seoH1 = readSeoText(settings.seo, ['h1Override', 'h1'], resolvedLocale, defaultLocale);
+  const businessName = getBusinessName(settings, '').trim();
+
+  return seoH1 || businessName || buildHomeH1(settings, services, resolvedLocale);
+}
+
 export function buildServiceH1(serviceTitle: string, settings: Settings, locale: string): string {
   return withLocation(serviceTitle, getLocationLabel(settings), locale);
 }

@@ -5,7 +5,7 @@
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
-import { buildHomeH1 } from '../../../lib/seo';
+import { buildHomeHeroTitle } from '../../../lib/seo';
 import type { ThemeSectionProps } from '../types';
 import { parseMinimalThemeData } from './themeData';
 
@@ -14,7 +14,7 @@ export function Hero({ settings, appearance, servicesItems }: ThemeSectionProps)
   const tokens = appearance.tokens;
   const themeData = parseMinimalThemeData(appearance.themeData);
   const companyName = settings.companyName || settings.businessType || t('business.defaultName');
-  const heroTitle = buildHomeH1(settings, servicesItems, locale);
+  const heroTitle = buildHomeHeroTitle(settings, servicesItems, locale);
   const heroImage =
     tokens.heroBackgroundImage ||
     'https://picsum.photos/seed/beauty-salon-minimal-hero/1200/1500';

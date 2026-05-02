@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
 import { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../../cms/types';
-import { buildHomeH1 } from '../../../lib/seo';
+import { buildHomeHeroTitle } from '../../../lib/seo';
 import { parseEditorialThemeData } from './themeData';
 
 export function Hero({ 
@@ -25,7 +25,7 @@ export function Hero({
   const themeData = parseEditorialThemeData(appearance.themeData);
   const tokens = appearance.tokens;
   const hasBgImage = !!tokens.heroBackgroundImage;
-  const heroTitle = buildHomeH1(settings, servicesItems, locale);
+  const heroTitle = buildHomeHeroTitle(settings, servicesItems, locale);
 
   const isSplit = themeData.heroStyle === 'split';
   const overlayOpacity = tokens.heroOverlay !== undefined ? tokens.heroOverlay : 0.4;
