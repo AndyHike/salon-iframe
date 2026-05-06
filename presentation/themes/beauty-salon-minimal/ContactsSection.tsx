@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import { submitContactForm } from '../../../app/actions/contact';
 import { useLocale } from '../../../components/LocaleContext';
 import { AppointmentFields } from '../../appointments/AppointmentFields';
+import { normalizeWorkingHours } from '../shared/workingHours';
 import type { ThemeSectionProps } from '../types';
 import { parseMinimalThemeData } from './themeData';
 
@@ -74,11 +75,7 @@ export function ContactsSection({
       ? { icon: Send, label: 'Telegram', href: settings.telegramUrl }
       : null,
   ].filter(Boolean) as Array<{ icon: typeof Instagram; label: string; href: string }>;
-  const workingHoursLabel = typeof settings.workingHours === 'string'
-    ? settings.workingHours
-    : settings.workingHours
-      ? t('contacts.byAppointment')
-      : null;
+  const workingHours = normalizeWorkingHours(settings.workingHours);
 
   return (
     <section id="contacts" className={`bg-white ${spacingClass} text-stone-950`}>
@@ -126,17 +123,36 @@ export function ContactsSection({
               );
             })}
 
-            {workingHoursLabel && (
+            {workingHours && (
               <div className="grid grid-cols-[auto_1fr] gap-4">
                 <Clock className="mt-1 h-4 w-4 text-[var(--primary-color)]" aria-hidden="true" />
-                <span>
+                <div>
                   <span className="block text-xs font-semibold uppercase tracking-[0.22em] text-stone-400">
                     {t('contacts.hours')}
                   </span>
-                  <span className="mt-1 block whitespace-pre-line text-base font-medium text-stone-950">
-                    {workingHoursLabel}
-                  </span>
-                </span>
+                  {workingHours.kind === 'structured' ? (
+                    <div className="mt-2 grid max-w-xs gap-1.5 text-sm text-stone-700">
+                      {workingHours.byAppointment && (
+                        <p className="mb-1 text-sm font-semibold text-[var(--primary-color)]">
+                          {t('contacts.byAppointment')}
+                        </p>
+                      )}
+                      {workingHours.days.map((day) => (
+                        <div
+                          key={day.day}
+                          className="grid grid-cols-[1fr_auto] gap-4 border-b border-stone-200 pb-1 last:border-0 last:pb-0"
+                        >
+                          <span className="font-medium capitalize text-stone-950">{t(`days.${day.day}`)}</span>
+                          <span>{day.isClosed ? t('contacts.closed') : `${day.open} - ${day.close}`}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="mt-1 block whitespace-pre-line text-base font-medium text-stone-950">
+                      {workingHours.text}
+                    </span>
+                  )}
+                </div>
               </div>
             )}
           </div>

@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { parseSiteAvailability } from './availability';
 import type { SiteAvailability } from './types';
+import { normalizeRequestDomain, stripHostPort } from '../lib/domain';
 
 const DEFAULT_CMS_REVALIDATE_SECONDS = Number.parseInt(
   process.env.CMS_CACHE_REVALIDATE_SECONDS || '86400',
@@ -15,14 +16,6 @@ function resolveDefaultRevalidateSeconds(): number {
 
 function readFirstHeaderValue(value: string | null): string | null {
   return value?.split(',')[0]?.trim() || null;
-}
-
-function stripHostPort(host: string): string {
-  if (host.startsWith('[')) {
-    return host.slice(1).split(']')[0] || host;
-  }
-
-  return host.split(':')[0] || host;
 }
 
 export async function resolveHostFromHeaders(): Promise<string> {
@@ -70,6 +63,16 @@ export type CmsFetchResult<T> =
       error?: unknown;
     };
 
+function invalidDomainResult<T>(): CmsFetchResult<T> {
+  return {
+    ok: false,
+    status: 400,
+    statusText: 'Invalid domain',
+    body: null,
+    availability: null,
+  };
+}
+
 async function readResponseBody(response: Response): Promise<unknown> {
   const text = await response.text();
   if (!text) return null;
@@ -102,6 +105,22 @@ export async function cmsFetchResult<T>(
   }
 ): Promise<CmsFetchResult<T>> {
   const { domain, method = 'GET', body, tags, revalidate, cache } = options;
+  const normalizedDomain = normalizeRequestDomain(domain);
+
+  if (!normalizedDomain) {
+    return invalidDomainResult<T>();
+  }
+
+  try {
+    const requestDomain = normalizeRequestDomain(await resolveDomainFromHeaders());
+    if (requestDomain && requestDomain !== normalizedDomain) {
+      return invalidDomainResult<T>();
+    }
+  } catch {
+    // Header access is only available during a Next request. In non-request contexts,
+    // syntactic validation still prevents path probes from reaching the CMS API.
+  }
+
   const baseUrl = process.env.ADMIN_API_URL || 'http://localhost:3000';
   const masterKey = process.env.SYSTEM_MASTER_KEY;
 
@@ -117,7 +136,7 @@ export async function cmsFetchResult<T>(
   }
 
   const url = new URL(path, baseUrl);
-  url.searchParams.set('domain', domain);
+  url.searchParams.set('domain', normalizedDomain);
   const acceptLanguage = await resolveAcceptLanguageHeader();
 
   const fetchOptions: RequestInit = {

@@ -1,5 +1,13 @@
 # Theme Contract For External Frontends
 
+Per-theme contracts now live in `docs/theme-contracts/`.
+
+- `beauty-salon-classic`: `docs/theme-contracts/beauty-salon-classic.md`
+- `beauty-salon-editorial`: `docs/theme-contracts/beauty-salon-editorial.md`
+- `beauty-salon-minimal`: `docs/theme-contracts/beauty-salon-minimal.md`
+
+Use this document for the platform-level shape of `SiteAppearance`; use the per-theme files as the admin allowlist for concrete controls and styles.
+
 Цей документ описує, як зовнішній frontend має створювати та підтримувати теми, щоб адмінка могла керувати ними через `SiteAppearance`.
 
 ## Core Principle
