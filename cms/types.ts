@@ -168,10 +168,16 @@ export type CmsItemResponse = {
   data: CmsItem;
 };
 
+export type ServiceCategoryGroupData = {
+  category: CmsCategory;
+  items: CmsItem[];
+};
+
 export type BeautySalonPageData = {
   settings: CmsSettingsResponse['data'];
   appearance: AppearanceContract;
   servicesItems: CmsItem[];
+  servicesData?: ServiceCategoryGroupData[];
   galleryItems: CmsItem[];
   availableLocales: Array<{ code: string; name: string }>;
   defaultLocale: string;

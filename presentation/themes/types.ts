@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import type { AppearanceContract, CmsItem, CmsSettingsResponse } from '../../cms/types';
+import type { AppearanceContract, CmsItem, CmsSettingsResponse, ServiceCategoryGroupData } from '../../cms/types';
 import type { AppointmentServiceSelection } from '../appointments/serviceRequest';
 
 export type ThemeNavigationBehavior = {
@@ -10,6 +10,7 @@ export type ThemeSectionProps = {
   settings: CmsSettingsResponse['data'];
   appearance: AppearanceContract;
   servicesItems: CmsItem[];
+  servicesData?: ServiceCategoryGroupData[];
   galleryItems: CmsItem[];
   domain: string;
   limit?: number;

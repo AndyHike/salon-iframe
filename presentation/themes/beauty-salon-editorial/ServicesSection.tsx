@@ -9,11 +9,13 @@ import { ServiceRequestAction } from '../../appointments/ServiceRequestAction';
 import { serviceDetailHref } from '../../../lib/routes';
 import { formatServicePrice } from '../../../lib/service-data';
 import { parseEditorialThemeData } from './themeData';
+import type { ServiceCategoryGroupData } from '../../../cms/types';
 
 export function ServicesSection({ 
   settings,
   appearance, 
   servicesItems,
+  servicesData,
   galleryItems,
   limit,
   onRequestService,
@@ -21,6 +23,7 @@ export function ServicesSection({
   settings: CmsSettingsResponse['data'];
   appearance: AppearanceContract;
   servicesItems: CmsItem[];
+  servicesData?: ServiceCategoryGroupData[];
   galleryItems: CmsItem[];
   domain: string;
   limit?: number;
@@ -30,9 +33,6 @@ export function ServicesSection({
   const variant = appearance.sectionVariants.services || 'list';
   const themeData = parseEditorialThemeData(appearance.themeData);
   
-  let displayItems = servicesItems;
-  if (limit) displayItems = displayItems.slice(0, limit);
-
   const getTitle = (item: CmsItem) => resolveLocalizedText(item.title, locale);
   const getDescription = (item: CmsItem) => resolveLocalizedText(item.description, locale);
 
@@ -41,52 +41,72 @@ export function ServicesSection({
   const surfaceClass = isPaper ? 'border border-stone-300 bg-[#fdfbf7]' : 'border border-stone-200 bg-white';
   const spacingClass = themeData.sectionSpacing === 'airy' ? 'py-32' : 'py-20';
 
-  type ServiceGroup = { title: string; items: CmsItem[] };
-  const groups: ServiceGroup[] = [];
-  const baseItems: CmsItem[] = [];
-  const subGroupsMap: Record<string, ServiceGroup> = {};
-  let baseTitleStr = '';
   const defaultLocale = settings.defaultLocale || 'uk';
 
-  displayItems.forEach(item => {
-    if (!item.categories || item.categories.length === 0) {
-      if (!baseItems.includes(item)) baseItems.push(item);
-      return;
-    }
-    
-    let addedToBase = false;
+  // Build groups from servicesData (pre-grouped by loader) if available,
+  // otherwise fall back to flat servicesItems
+  type ServiceGroup = { title: string; items: CmsItem[] };
+  let groups: ServiceGroup[] = [];
 
-    item.categories.forEach(cat => {
-      if (cat.slug === 'services') {
-        if (!addedToBase) {
-          baseItems.push(item);
-          addedToBase = true;
-          if (!baseTitleStr) {
-            const tObj = cat?.title as Record<string, string>;
-            baseTitleStr = tObj?.[locale] || tObj?.[defaultLocale] || '';
+  if (servicesData && servicesData.length > 0) {
+    // Use the pre-grouped data from the loader
+    groups = servicesData.map((group) => {
+      const titleObj = group.category.title as Record<string, string>;
+      const title = titleObj?.[locale] || titleObj?.[defaultLocale] || '';
+      const items = limit ? group.items.slice(0, limit) : group.items;
+      return { title, items };
+    }).filter((g) => g.items.length > 0);
+  } else {
+    // Fallback: use flat servicesItems with category-based grouping
+    let displayItems = servicesItems;
+    if (limit) displayItems = displayItems.slice(0, limit);
+
+    const baseItems: CmsItem[] = [];
+    const subGroupsMap: Record<string, ServiceGroup> = {};
+    let baseTitleStr = '';
+
+    displayItems.forEach(item => {
+      if (!item.categories || item.categories.length === 0) {
+        if (!baseItems.includes(item)) baseItems.push(item);
+        return;
+      }
+      
+      let addedToBase = false;
+
+      item.categories.forEach(cat => {
+        if (cat.slug === 'services') {
+          if (!addedToBase) {
+            baseItems.push(item);
+            addedToBase = true;
+            if (!baseTitleStr) {
+              const tObj = cat?.title as Record<string, string>;
+              baseTitleStr = tObj?.[locale] || tObj?.[defaultLocale] || '';
+            }
+          }
+        } else {
+          const catSlug = cat.slug;
+          const catTitleObj = cat.title as Record<string, string>;
+          const catTitleStr = catTitleObj?.[locale] || catTitleObj?.[defaultLocale] || '';
+
+          if (!subGroupsMap[catSlug]) {
+            subGroupsMap[catSlug] = { title: catTitleStr, items: [] };
+          }
+          if (!subGroupsMap[catSlug].items.includes(item)) {
+            subGroupsMap[catSlug].items.push(item);
           }
         }
-      } else {
-        const catSlug = cat.slug;
-        const catTitleObj = cat.title as Record<string, string>;
-        const catTitleStr = catTitleObj?.[locale] || catTitleObj?.[defaultLocale] || '';
-
-        if (!subGroupsMap[catSlug]) {
-          subGroupsMap[catSlug] = { title: catTitleStr, items: [] };
-        }
-        if (!subGroupsMap[catSlug].items.includes(item)) {
-          subGroupsMap[catSlug].items.push(item);
-        }
-      }
+      });
     });
-  });
 
-  if (baseItems.length > 0) {
-    groups.push({ title: baseTitleStr || t('services.baseCategories'), items: baseItems });
+    if (baseItems.length > 0) {
+      groups.push({ title: baseTitleStr || t('services.baseCategories'), items: baseItems });
+    }
+    Object.values(subGroupsMap).forEach(g => {
+      if (g.items.length > 0) groups.push(g);
+    });
   }
-  Object.values(subGroupsMap).forEach(g => {
-    if (g.items.length > 0) groups.push(g);
-  });
+
+  const totalItems = groups.reduce((sum, g) => sum + g.items.length, 0);
 
   return (
     <section id="services" className={`${spacingClass} bg-stone-50 border-t border-stone-200`}>
@@ -104,7 +124,7 @@ export function ServicesSection({
           </span>
         </motion.div>
         
-        {displayItems.length === 0 ? (
+        {totalItems === 0 ? (
           <p className="text-center text-stone-500 uppercase tracking-widest text-sm">{t('services.empty')}</p>
         ) : (
           <div className="max-w-7xl mx-auto space-y-32">

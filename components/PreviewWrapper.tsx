@@ -97,6 +97,7 @@ export function PreviewWrapper({
               settings={data.settings}
               appearance={themeAppearance}
               servicesItems={data.servicesItems}
+              servicesData={data.servicesData}
               galleryItems={data.galleryItems}
               domain={domain}
               limit={limit}

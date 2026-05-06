@@ -7,7 +7,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { renderAvailabilityPage } from '@/components/AvailabilityPage';
 import { cmsFetchResult } from '@/cms/client';
 import { loadSiteBootstrap } from '@/cms/loaders/loadSiteBootstrap';
-import type { CmsItem, CmsItemsResponse } from '@/cms/types';
+import type { CmsItem, CmsItemsResponse, CmsCategory, CmsCategoriesResponse, ServiceCategoryGroupData } from '@/cms/types';
 import { getCssVariablesFromTokens, getFontFamilyFromTokens } from '@/presentation/appearance/applyTokens';
 import { resolveThemeAppearance, resolveThemeDefinition } from '@/presentation/themes/registry';
 import { cacheTags, uniqueCacheTags } from '@/lib/cache-tags';
@@ -46,8 +46,6 @@ export default async function LocalizedServicesPage({
   const { domain, locale } = await params;
   const resolvedSearchParams = await searchParams;
   const page = typeof resolvedSearchParams.page === 'string' ? parseInt(resolvedSearchParams.page, 10) : 1;
-  const limit = 20;
-  const offset = (page - 1) * limit;
 
   const bootstrap = await loadSiteBootstrap(domain);
 
@@ -63,25 +61,81 @@ export default async function LocalizedServicesPage({
   const siteLocale = resolveSiteLocale(bootstrap.settings, locale, currentPath);
   const { settings, appearance, siteId } = bootstrap;
 
-  const servicesRes = await cmsFetchResult<CmsItemsResponse>(`/api/public/v1/items?categorySlug=services&include=categories&limit=${limit}&offset=${offset}`, {
+  // Step 1: Fetch categories to find subcategories of 'services'
+  const categoriesRes = await cmsFetchResult<CmsCategoriesResponse>('/api/public/v1/categories', {
     domain,
     tags: uniqueCacheTags([
       cacheTags.domain(domain),
       cacheTags.site(siteId),
-      cacheTags.collection(siteId, 'services'),
+      cacheTags.collection(siteId, 'categories'),
       cacheTags.listView(siteId, 'services'),
-      cacheTags.legacy.collection(domain, 'services'),
     ]),
   });
 
-  if (!servicesRes.ok && servicesRes.availability) {
-    return renderAvailabilityPage({ availability: servicesRes.availability, domain, locale: siteLocale.locale });
+  if (!categoriesRes.ok && categoriesRes.availability) {
+    return renderAvailabilityPage({ availability: categoriesRes.availability, domain, locale: siteLocale.locale });
   }
 
-  const servicesData = servicesRes.ok ? servicesRes.data : null;
-  const servicesItems: CmsItem[] = servicesData?.success && servicesData.data ? servicesData.data : [];
-  const totalItems = servicesData?.success && servicesData.meta?.total ? servicesData.meta.total : servicesItems.length;
-  const totalPages = Math.ceil(totalItems / limit);
+  const categories: CmsCategory[] = categoriesRes.ok && categoriesRes.data?.success ? categoriesRes.data.data : [];
+  const servicesCategory = categories.find((c) => c.slug === 'services');
+  const serviceSubcategories = categories.filter((c) => c.parentId === servicesCategory?.id);
+
+  // Step 2: Fetch items for main 'services' category
+  let servicesData: ServiceCategoryGroupData[] = [];
+  let allServicesItems: CmsItem[] = [];
+
+  if (servicesCategory) {
+    const mainItemsRes = await cmsFetchResult<CmsItemsResponse>('/api/public/v1/items?categorySlug=services&include=categories&limit=100', {
+      domain,
+      tags: uniqueCacheTags([
+        cacheTags.domain(domain),
+        cacheTags.site(siteId),
+        cacheTags.collection(siteId, 'services'),
+        cacheTags.listView(siteId, 'services'),
+        cacheTags.legacy.collection(domain, 'services'),
+      ]),
+    });
+
+    if (!mainItemsRes.ok && mainItemsRes.availability) {
+      return renderAvailabilityPage({ availability: mainItemsRes.availability, domain, locale: siteLocale.locale });
+    }
+
+    const mainItems: CmsItem[] = mainItemsRes.ok && mainItemsRes.data?.success && mainItemsRes.data.data
+      ? mainItemsRes.data.data
+      : [];
+
+    if (mainItems.length > 0) {
+      servicesData.push({ category: servicesCategory, items: mainItems });
+    }
+  }
+
+  // Step 3: Fetch items for each subcategory in parallel
+  if (serviceSubcategories.length > 0) {
+    const subResults = await Promise.all(
+      serviceSubcategories.map(async (sub) => {
+        const res = await cmsFetchResult<CmsItemsResponse>(
+          `/api/public/v1/items?categorySlug=${encodeURIComponent(sub.slug)}&include=categories&limit=100`,
+          {
+            domain,
+            tags: uniqueCacheTags([
+              cacheTags.domain(domain),
+              cacheTags.site(siteId),
+              cacheTags.collection(siteId, sub.slug),
+              cacheTags.listView(siteId, 'services'),
+            ]),
+          }
+        );
+        const items: CmsItem[] = res.ok && res.data?.success && res.data.data ? res.data.data : [];
+        return { category: sub, items };
+      })
+    );
+
+    servicesData = [...servicesData, ...subResults.filter((d) => d.items.length > 0)];
+  }
+
+  allServicesItems = servicesData.flatMap((group) => group.items);
+  const totalItems = allServicesItems.length;
+  const totalPages = 1; // All items loaded at once now
 
   const cssVars = getCssVariablesFromTokens(appearance.tokens);
   const fontFamily = getFontFamilyFromTokens(appearance.tokens);
@@ -93,7 +147,7 @@ export default async function LocalizedServicesPage({
 
   return (
     <>
-      <JsonLd id="services-json-ld" data={buildServicesJsonLd(settings, servicesItems, domain, siteLocale.locale)} />
+      <JsonLd id="services-json-ld" data={buildServicesJsonLd(settings, allServicesItems, domain, siteLocale.locale)} />
       <ClientProviders
         defaultLocale={siteLocale.locale}
         availableLocales={siteLocale.availableLocaleCodes}
@@ -117,28 +171,11 @@ export default async function LocalizedServicesPage({
           <ServicesRenderer
             settings={settings}
             appearance={themeAppearance}
-            servicesItems={servicesItems}
+            servicesItems={allServicesItems}
+            servicesData={servicesData}
             galleryItems={[]}
             domain={domain}
           />
-
-          {totalPages > 1 && (
-            <div className="container mx-auto px-4 pb-24 flex justify-center gap-2">
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <Link
-                  key={i}
-                  href={localizedPath(siteLocale.locale, `/services?page=${i + 1}`)}
-                  className={`w-10 h-10 flex items-center justify-center rounded-full border transition-colors ${
-                    page === i + 1
-                      ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)]'
-                      : 'border-stone-200 text-stone-600 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]'
-                  }`}
-                >
-                  {i + 1}
-                </Link>
-              ))}
-            </div>
-          )}
         </main>
         <Footer appearance={themeAppearance} settings={settings} />
       </div>
