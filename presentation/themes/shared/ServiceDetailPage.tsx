@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+import { CmsImage } from './CmsImage';
 import Link from 'next/link';
 import { ArrowLeft, Clock, MapPin, Phone, Tag } from 'lucide-react';
 import { resolveLocalizedText } from '@/cms/normalize/localized';
@@ -168,14 +168,13 @@ export function ServiceDetailPage({
           <div className="grid gap-6">
             {primaryImage ? (
               <div className="relative aspect-[4/5] overflow-hidden bg-stone-200">
-                <Image
-                  src={primaryImage.filePath}
+                <CmsImage
+                  image={primaryImage}
                   alt={imageAlt(serviceItem, serviceTitle, businessName, location, 0, locale)}
-                  fill
-                  priority
                   sizes="(min-width: 1024px) 48vw, 100vw"
                   className="object-cover"
-                  referrerPolicy="no-referrer"
+                  fill
+                  priority
                 />
               </div>
             ) : (
@@ -199,13 +198,12 @@ export function ServiceDetailPage({
                     className="relative aspect-square overflow-hidden bg-stone-200"
                     aria-label={serviceTitle}
                   >
-                    <Image
-                      src={image.filePath}
+                    <CmsImage
+                      image={image}
                       alt={imageAlt(serviceItem, serviceTitle, businessName, location, index + 1, locale)}
-                      fill
                       sizes="(min-width: 768px) 16vw, 50vw"
                       className="object-cover transition duration-700 hover:scale-105"
-                      referrerPolicy="no-referrer"
+                      fill
                     />
                   </Link>
                 ))}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import Image from 'next/image';
+import { CmsImage } from './CmsImage';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useLocale } from '@/components/LocaleContext';
 import type { GalleryImageItem } from './galleryData';
@@ -123,13 +123,12 @@ export function GalleryLightbox({
         className="relative h-full max-h-[88vh] w-full max-w-6xl"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <Image
-          src={activeImage.filePath}
+        <CmsImage
+          image={activeImage}
           alt={activeImage.altText}
-          fill
           sizes="100vw"
           className="object-contain"
-          referrerPolicy="no-referrer"
+          fill
         />
 
         <div className="absolute bottom-4 left-1/2 max-w-[calc(100%-2rem)] -translate-x-1/2">

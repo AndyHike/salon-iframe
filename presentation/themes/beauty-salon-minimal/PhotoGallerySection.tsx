@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Image from 'next/image';
+import { CmsImage } from '../shared/CmsImage';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { useLocale } from '../../../components/LocaleContext';
@@ -115,13 +115,12 @@ export function PhotoGallerySection({ settings, appearance, servicesItems, galle
                     className={`relative block w-full ${imageRatioClass} overflow-hidden bg-stone-200`}
                     aria-label={`${openImageLabel}: ${image.altText}`}
                   >
-                    <Image
-                      src={image.filePath}
+                    <CmsImage
+                      image={image}
                       alt={image.altText}
-                      fill
                       sizes="(min-width: 768px) 25vw, 50vw"
                       className="object-cover transition duration-700 hover:scale-105"
-                      referrerPolicy="no-referrer"
+                      fill
                     />
                   </button>
                 ))}
@@ -146,13 +145,12 @@ export function PhotoGallerySection({ settings, appearance, servicesItems, galle
                     }}
                     aria-label={`${openImageLabel}: ${image.altText}`}
                   >
-                    <Image
-                      src={image.filePath}
+                    <CmsImage
+                      image={image}
                       alt={image.altText}
-                      fill
                       sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
                       className="object-cover transition duration-700 hover:scale-105"
-                      referrerPolicy="no-referrer"
+                      fill
                     />
                   </button>
                 ))}

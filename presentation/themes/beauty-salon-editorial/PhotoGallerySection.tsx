@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useLocale } from '../../../components/LocaleContext';
 import { motion } from 'motion/react';
-import Image from 'next/image';
+import { CmsImage } from '../shared/CmsImage';
 import Link from 'next/link';
 import type { ThemeSectionProps } from '../types';
 import { GalleryLightbox } from '../shared/GalleryLightbox';
@@ -118,13 +118,12 @@ export function PhotoGallerySection({
                     aria-label={`${openImageLabel}: ${image.altText}`}
                   >
                     <div className="relative w-full h-full overflow-hidden bg-stone-100 object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
-                      <Image
-                        src={image.filePath}
+                      <CmsImage
+                        image={image}
                         alt={image.altText}
-                        fill
                         sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                         className="object-cover"
-                        referrerPolicy="no-referrer"
+                        fill
                       />
                     </div>
                   </button>
@@ -142,13 +141,12 @@ export function PhotoGallerySection({
                     aria-label={`${openImageLabel}: ${image.altText}`}
                   >
                     <div className="relative w-full overflow-hidden bg-stone-100 grayscale hover:grayscale-0 transition-all duration-700" style={{ paddingBottom: i % 3 === 0 ? '130%' : i % 2 === 0 ? '75%' : '100%' }}>
-                      <Image
-                        src={image.filePath}
+                      <CmsImage
+                        image={image}
                         alt={image.altText}
-                        fill
                         sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                         className="object-cover absolute inset-0"
-                        referrerPolicy="no-referrer"
+                        fill
                       />
                     </div>
                   </button>
@@ -166,13 +164,12 @@ export function PhotoGallerySection({
                     aria-label={`${openImageLabel}: ${image.altText}`}
                   >
                     <div className="relative w-full h-full overflow-hidden bg-stone-100 grayscale group-hover:grayscale-0 transition-all duration-700">
-                      <Image
-                        src={image.filePath}
+                      <CmsImage
+                        image={image}
                         alt={image.altText}
-                        fill
                         sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 85vw"
                         className="object-cover"
-                        referrerPolicy="no-referrer"
+                        fill
                       />
                     </div>
                   </button>

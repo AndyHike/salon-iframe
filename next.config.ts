@@ -8,29 +8,19 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  // Allow access to remote image placeholder.
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**', // This allows any path under the hostname
-      },
-      {
-        protocol: 'https',
-        hostname: 'pub-2e273ebda5a9476c8b5619d86fb279e5.r2.dev',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.r2.dev',
-        port: '',
-        pathname: '/**',
-      }
-    ],
-  },
+  // `remotePatterns` is gone, and that is not a loosening.
+  //
+  // It only ever gated Next's built-in image optimizer, and admin-hosted media
+  // no longer goes through it: those images arrive from the admin with a
+  // finished `srcset` and render as plain `<img>` (see presentation/themes/
+  // shared/CmsImage.tsx). Nothing here reaches `/_next/image` any more.
+  //
+  // Worth recording why keeping it would have been worse than useless: the list
+  // allowed only `picsum.photos` and `*.r2.dev`, while the admin has moved to a
+  // custom media domain. It was already refusing the real image host - so as
+  // soon as the admin switched to transformed delivery, these images would have
+  // broken rather than merely stayed oversized. That is the one place in this
+  // whole migration where doing nothing was worse than doing nothing.
   output: 'standalone',
   transpilePackages: ['motion'],
   webpack: (config, {dev}) => {

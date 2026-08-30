@@ -108,6 +108,31 @@ export type CmsItemCategory = {
   }>;
 };
 
+/**
+ * One image as the admin delivers it: a finished URL, a finished `srcset` across
+ * the admin's own size ladder, and intrinsic pixels when it knows them.
+ *
+ * `filePath` is the historical name and still holds a ready-to-render URL, so
+ * nothing reading it breaks. What it stopped being is the full-size master.
+ *
+ * Never assemble a URL from these. The admin's URL shape is explicitly not part
+ * of its contract and changes without notice; there is also no size outside the
+ * `srcset`, so there is nothing a template could build that the list does not
+ * already contain. `srcset` is null for externally hosted images and when the
+ * admin has transformed delivery switched off; `width`/`height` are null for
+ * anything uploaded before the admin recorded them.
+ */
+export type CmsImage = {
+  id: string;
+  filePath: string;
+  altText?: string | null;
+  isMain?: boolean;
+  position?: number;
+  srcset?: string | null;
+  width?: number | null;
+  height?: number | null;
+};
+
 export type CmsItem = {
   id: string;
   title: Record<string, string>;
@@ -118,13 +143,7 @@ export type CmsItem = {
   price?: string | number | null;
   attributes?: Record<string, unknown> | null;
   categories?: CmsItemCategory[];
-  images?: Array<{
-    id: string;
-    filePath: string;
-    altText?: string | null;
-    isMain?: boolean;
-    position?: number;
-  }>;
+  images?: CmsImage[];
   linkedItems?: Array<{
     id: string;
     type: string;
@@ -134,7 +153,7 @@ export type CmsItem = {
       title: Record<string, string>;
       slug: string;
       price?: string | number | null;
-      images?: Array<{ id: string; filePath: string; altText?: string | null }>;
+      images?: CmsImage[];
     };
   }>;
 };

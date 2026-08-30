@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useLocale } from '../../../components/LocaleContext';
 import { motion } from 'motion/react';
-import Image from 'next/image';
+import { CmsImage } from '../shared/CmsImage';
 import Link from 'next/link';
 import type { ThemeSectionProps } from '../types';
 import { GalleryLightbox } from '../shared/GalleryLightbox';
@@ -114,13 +114,12 @@ export function PhotoGallerySection({
                     className={`relative block aspect-square w-full overflow-hidden group shadow-sm ${radiusClass}`}
                     aria-label={`${openImageLabel}: ${image.altText}`}
                   >
-                    <Image
-                      src={image.filePath}
+                    <CmsImage
+                      image={image}
                       alt={image.altText}
-                      fill
                       sizes="(min-width: 768px) 25vw, 50vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      referrerPolicy="no-referrer"
+                      fill
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
                   </button>
@@ -138,13 +137,12 @@ export function PhotoGallerySection({
                     style={{ aspectRatio: i % 3 === 0 ? '3/4' : i % 2 === 0 ? '4/3' : '1/1' }}
                     aria-label={`${openImageLabel}: ${image.altText}`}
                   >
-                    <Image
-                      src={image.filePath}
+                    <CmsImage
+                      image={image}
                       alt={image.altText}
-                      fill
                       sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      referrerPolicy="no-referrer"
+                      fill
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
                   </button>
@@ -161,13 +159,12 @@ export function PhotoGallerySection({
                     className={`relative flex-none w-4/5 md:w-1/3 aspect-[4/5] overflow-hidden group shadow-sm snap-center ${radiusClass}`}
                     aria-label={`${openImageLabel}: ${image.altText}`}
                   >
-                    <Image
-                      src={image.filePath}
+                    <CmsImage
+                      image={image}
                       alt={image.altText}
-                      fill
                       sizes="(min-width: 768px) 33vw, 80vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      referrerPolicy="no-referrer"
+                      fill
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
                   </button>
